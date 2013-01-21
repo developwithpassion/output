@@ -1,48 +1,50 @@
 require_relative '../proofs_init'
 
-class WriterBuilder
-  def self.create_string_appender
-    layout = Logging.layouts.pattern(:pattern => '%m\n')
-    string_appender = Logging::Appenders::StringIo.new('string', :layout => layout)
+module Examples
+  class WriterBuilder
+    def self.create_string_appender
+      layout = Logging.layouts.pattern(:pattern => '%m\n')
+      string_appender = Logging::Appenders::StringIo.new('string', :layout => layout)
 
-    string_appender
+      string_appender
+    end
+
+    def self.create_writer(name, appender)
+
+      logger = Logging.logger[name]
+      logger.appenders = appender
+      logger.level = :debug
+
+      writer = ::Output::Writer.new logger, :debug
+      writer
+    end
   end
 
-  def self.create_writer(name, appender)
+  class AppOutput
+    include Output::OutputBase
 
-    logger = Logging.logger[name]
-    logger.appenders = appender
-    logger.level = :debug
+    writer :message, :level => :info
 
-    writer = ::Output::Writer.new logger, :debug
-    writer
+    writer :formatted_message, :level => :debug do|message|
+      "Formatted Message: #{message}"
+    end
   end
+
 end
-
-class AppOutput
-  include Output::OutputBase
-
-  writer :message, :level => :info
-
-  writer :formatted_message, :level => :debug do|message|
-    "Formatted Message: #{message}"
-  end
-end
-
-def initialize_writers(appender)
-  AppOutput.message_logger = WriterBuilder.create_writer 'Example1::First', appender
-  AppOutput.formatted_message_logger = WriterBuilder.create_writer 'Example1::Second', appender
-end
-
 
 ##Write some messages using the output mechanism
 
+def initialize_writers(appender)
+  Examples::AppOutput.message_logger = Examples::WriterBuilder.create_writer 'Example1::First', appender
+  Examples::AppOutput.formatted_message_logger = Examples::WriterBuilder.create_writer 'Example1::Second', appender
+end
+
 proof 'Outputs log messages' do
-  appender = WriterBuilder.create_string_appender
+  appender = Examples::WriterBuilder.create_string_appender
   initialize_writers appender
 
-  AppOutput.message 'Hello'
-  AppOutput.formatted_message 'Hello'
+  Examples::AppOutput.message 'Hello'
+  Examples::AppOutput.formatted_message 'Hello'
 
   appender.prove { /Hello/ =~ readlines.join("\n") }
 end
