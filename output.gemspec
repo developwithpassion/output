@@ -11,4 +11,6 @@ Gem::Specification.new do |s|
   s.required_ruby_version = '>= 1.9.2'
   s.require_paths = ['lib']
   s.files = Dir.glob('{lib}/**/*')
+
+  s.add_dependency 'logging'
 end
