@@ -1,4 +1,3 @@
-
 module Output
   def self.included(base)
     base.extend ClassMethods
