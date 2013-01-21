@@ -1,12 +1,12 @@
 module Output
   class Writer
     attr_reader :logger
-    attr_reader :default_level
+    attr_reader :level
     attr_reader :enabled
 
-    def initialize(logger, default_level)
+    def initialize(logger, level)
       @logger = logger
-      @default_level = default_level
+      @level = level
       enable
     end
 
@@ -27,8 +27,8 @@ module Output
       @enabled
     end
 
-    def write(logging_method, message)
-      logger.send logging_method, message if enabled?
+    def write(message)
+      logger.send level, message if enabled?
     end
   end
 end
