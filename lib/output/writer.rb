@@ -10,7 +10,7 @@ module Output
       enable
     end
 
-    def self.build(writer_name, level, logger_level=Output::DEFAULT_LEVEL)
+    def self.build(writer_name, level, logger_level=Output::DEFAULT_LOGGER_LEVEL)
       logger = logger(writer_name, logger_level)
       writer = new(logger, level)
     end
@@ -25,14 +25,6 @@ module Output
       logger.appenders = stdout_appender
 
       logger
-    end
-
-    def threshold
-      logger.level
-    end
-
-    def threshold=(val)
-      logger.level = val
     end
 
     def disable

@@ -5,12 +5,12 @@ module Output
     base.extend ClassMethods
   end
 
-  def write(method, description)
-    send method, description
+  def disable
+    self.class.writers.disable
   end
 
-  def self.disable
-    writers.disable
+  def write(method, message)
+    send method, message
   end
 
   def level
@@ -22,13 +22,36 @@ module Output
     self.class.writers.logger_level = level
   end
 
+  def levels
+    @levels ||= []
+  end
+
+  def push_level(level)
+    levels.unshift level
+    self.level = level
+
+    if block_given?
+      yield
+      level = pop_level
+    end
+    
+    level
+  end
+
+  def pop_level
+    level = levels.shift unless levels.empty?
+    self.level = level
+    level
+  end
+
   module ClassMethods
     def logger_level
       @logger_level ||= Output::DEFAULT_LOGGER_LEVEL
     end
 
-    def level(level)
-      @logger_level = level
+    def level(level=nil)
+      @logger_level = level unless level.nil?
+      @logger_level
     end
 
     def writers
@@ -44,9 +67,7 @@ module Output
 
       define_writer_accessor name, writer
 
-      define_write_method name, 
-                    writer,
-                    transform
+      define_write_method name, writer, transform
 
       writers << writer
     end

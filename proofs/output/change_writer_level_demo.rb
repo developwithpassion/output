@@ -17,7 +17,7 @@ writer = output.details_writer
 # Logger: debug
 # => should write
 
-puts writer.logger.level # => :info
+# puts writer.logger.level # => :info
 output.details "This doesn't write because the writer is :debug and the logger is :info"
 
 # Goal
@@ -27,5 +27,5 @@ output.details "This doesn't write because the writer is :debug and the logger i
 # => means: all loggers set to info
 
 output.level = :debug
-puts writer.logger.level
+# puts writer.logger.level
 output.details "This writes because the writer is :debug and the logger is :debug"

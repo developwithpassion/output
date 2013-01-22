@@ -3,6 +3,5 @@ puts
 
 require_relative '../init.rb'
 
-# require 'proof'
-
-# include Proof
+require 'proof'
+include Proof
