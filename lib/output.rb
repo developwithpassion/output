@@ -1,4 +1,4 @@
-require 'logger'
+require 'logging'
 require 'setter'
 require 'single'
 

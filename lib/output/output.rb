@@ -43,7 +43,7 @@ module Output
     end
 
     def logger(name)
-      logger = Logging.logger name.to_s
+      logger = ::Logging.logger[name.to_s]
 
       layout = Logging.layouts.pattern(:pattern => '%m\n')
       stdout_appender = Logging::Appenders::Stdout.new('stdout', :layout => layout)

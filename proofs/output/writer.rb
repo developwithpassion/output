@@ -1,36 +1,31 @@
 require_relative '../proofs_init'
-require_relative 'examples'
 
-module Logging
-  module Appenders
-    class StringIo
-      def contains?(message)
-        @content ||= read
-        /#{message}/.match @content
+module Output
+  class Writer
+    module Proof
+      def written?(message)
+        logger.appenders.first.sio.to_s.include? message
       end
     end
   end
 end
 
-def create_writer_with_string_appender
-  appender = Examples::WriterBuilder.create_string_appender
-  writer = Examples::WriterBuilder.create_writer 'example', appender
+def writer
+  logger = Logging.logger['info']
 
-  return writer, appender
+  layout = Logging.layouts.pattern(:pattern => '%m\n')
+  appender = Logging::Appenders::StringIo.new('string_io', :layout => layout)
+
+  logger.appenders = appender
+
+  writer = Output::Writer.new logger, :info
+  writer.extend Output::Writer::Proof
+
+  writer
 end
 
-proof 'Output only gets written when the writer is enabled' do
-  writer, appender  = create_writer_with_string_appender
+w = writer
+w.write 'some message'
 
-  writer.write :info, 'Hello'
-
-  writer.disable
-  writer.write :info, 'Not Displayed'
-
-  writer.enable
-  writer.write :info, 'Again'
-
-  appender.prove { contains? 'Hello' }
-  appender.prove { not contains? 'Not Displayed' }
-  appender.prove { contains? 'Again' }
-end
+# TODO use proof once we fix it
+raise unless w.written? 'some message'

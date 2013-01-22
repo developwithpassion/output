@@ -10,10 +10,10 @@ module Output
       enable
     end
 
-    def self.build(writer_name, level = :debug)
-      logger = Logging.logger[writer_name]
-      writer = new logger, level
-    end
+    # def self.build(writer_name, level = :debug)
+    #   logger = Logging.logger[writer_name]
+    #   writer = new logger, level
+    # end
 
     def disable
       @enabled = false
