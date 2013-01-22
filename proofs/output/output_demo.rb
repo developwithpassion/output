@@ -9,4 +9,3 @@ class SomeOutput
 end
 
 SomeOutput.message "This writes a message to STDOUT"
-

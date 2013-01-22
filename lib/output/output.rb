@@ -1,4 +1,6 @@
 module Output
+  DEFAULT_LOGGER_LEVEL = :info
+
   def self.included(base)
     base.extend ClassMethods
   end
@@ -11,11 +13,24 @@ module Output
     writers.disable
   end
 
-  def self.level=
-    writers.disable
+  def level
+    @level ||= self.class.logger_level
+  end
+
+  def level=(level)
+    @level = level
+    self.class.writers.logger_level = level
   end
 
   module ClassMethods
+    def logger_level
+      @logger_level ||= Output::DEFAULT_LOGGER_LEVEL
+    end
+
+    def level(level)
+      @logger_level = level
+    end
+
     def writers
       @writers ||= [].extend Writers
     end
@@ -25,10 +40,9 @@ module Output
 
       level = options.fetch(:level, name)
 
-      define_writer_accessor name
+      writer = Writer.build(name, level, logger_level)
 
-      logger = logger(name)
-      writer = Writer.new(logger, level)
+      define_writer_accessor name, writer
 
       define_write_method name, 
                     writer,
@@ -37,20 +51,12 @@ module Output
       writers << writer
     end
 
-    def define_writer_accessor(name)
+    def define_writer_accessor(name, writer)
       accessor_name = "#{name}_writer"
-      setting accessor_name
-    end
 
-    def logger(name)
-      logger = ::Logging.logger[name.to_s]
-
-      layout = Logging.layouts.pattern(:pattern => '%m\n')
-      stdout_appender = Logging::Appenders::Stdout.new('stdout', :layout => layout)
-
-      logger.appenders = stdout_appender
-
-      logger
+      # TODO if setting, make the accessor a setting
+      # otherwise, it's just a plain old accessor
+      setting accessor_name, writer
     end
 
     def define_write_method(name, writer, transform)

@@ -6,9 +6,15 @@ module Output
       end
     end
 
-    def level=(new_level)
+    def level=(level)
       each do |writer|
-        writer.level = new_level
+        writer.level = level
+      end
+    end
+
+    def logger_level=(level)
+      each do |writer|
+        writer.logger.level = level
       end
     end
   end
