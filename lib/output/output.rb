@@ -66,8 +66,8 @@ module Output
     level
   end
 
-  def build_writer(definition)
-    name, level, transform_block = definition.flatten
+  def build_writer(writer_definition)
+    name, level, transform_block = writer_definition.flatten
     writer = Writer.build name, level, transform_block, self.level
   end
 
@@ -104,14 +104,14 @@ module Output
     alias :writer :writer_macro
 
     def define_writer_accessor(definition)
-      writer_name = definition.name
-      accessor_name = writer_accessor(writer_name)
+      define_writer_getter(definition)
+      define_writer_setter(definition)
+    end
+
+    def define_writer_getter(definition)
+      accessor_name = writer_accessor(definition.name)
       var_name = :"@#{accessor_name}"
 
-      # TODO consider JP's design in regards to an "accessor" object (or module)
-      # to encapsulate the definition (generation) of the getter/setter methods
-
-      # TODO move to "define_setter" method
       send :define_method, accessor_name do
         writer = instance_variable_get var_name
 
@@ -122,11 +122,16 @@ module Output
 
         writer
       end
+    end
 
-      # TODO move to "define_getter" method
+    def define_writer_setter(definition)
+      accessor_name = writer_accessor(definition.name)
+      var_name = :"@#{accessor_name}"
+
       send :define_method, "#{accessor_name}=" do |writer|
         instance_variable_set var_name, writer
         writers[name] = writer
+        writer
       end
     end
 
