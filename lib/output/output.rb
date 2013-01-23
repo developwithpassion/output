@@ -61,10 +61,13 @@ module Output
     alias :level :logger_level=
 
     def writers
-      @writers ||= [].extend Writers
+      @writers ||= {}.extend Writers
     end
 
     def writer(name, options = {}, &transform_block)
+      # TODO construct writer definition
+      # make it an OpenStruct (require 'ostruct' fromRuby standard library)
+      
       transform = transform_block || ->(message) { message } 
 
       level = options.fetch(:level, name)
@@ -76,12 +79,20 @@ module Output
       define_write_method name, writer, transform
 
       # TODO writers need to be on instance, not on class
-      writers << writer
+      writers[name] = writer
     end
 
     def define_writer_accessor(name, writer)
       # TODO if setting, make the accessor a setting
       # otherwise, it's just a plain old accessor
+
+      =begin
+        @some_writer ||= build_writer(name)
+        # needs 'build_writer' method on instance (defined above in Output module)
+        # build_writer method looks up the writer definition in class.writer_definitions (now called 'writers', but that will change)
+        # constructs a writer with the parameters found in the struct
+      =end
+
       setting writer_accessor(name), writer
     end
 
