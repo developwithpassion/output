@@ -2,7 +2,7 @@ require 'ostruct'
 
 class WriterDefinition < OpenStruct
   def flatten
-    return name, level, transform_block
+    return name, level, message_transformer
   end
 end
 
@@ -67,8 +67,8 @@ module Output
   end
 
   def build_writer(writer_definition)
-    name, level, transform_block = writer_definition.flatten
-    writer = Writer.build name, level, transform_block, self.level
+    name, level, message_transformer = writer_definition.flatten
+    writer = Writer.build name, level, message_transformer, self.level
   end
 
   module ClassMethods
@@ -86,14 +86,14 @@ module Output
       @writer_definitions ||= {}.extend Writers
     end
 
-    def writer_macro(name, options = {}, &transform_block)
-      transform_block = transform_block || ->(message) { message } 
+    def writer_macro(name, options = {}, &message_transformer)
+      message_transformer = message_transformer || ->(message) { message } 
       level = options.fetch(:level, name)
 
       definition = WriterDefinition.new
       definition.name = name
       definition.level = level
-      definition.transform_block = transform_block
+      definition.message_transformer = message_transformer
 
       writer_definitions[name] = definition
 

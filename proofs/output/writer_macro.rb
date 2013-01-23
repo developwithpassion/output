@@ -31,7 +31,7 @@ SomeOutput = Class.new do
     end
 
     def message_transformer?(name, block)
-      definition(name).transform_block == block
+      definition(name).message_transformer == block
     end
   end
 end

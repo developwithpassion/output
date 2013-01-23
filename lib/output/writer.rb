@@ -3,7 +3,7 @@ module Output
     attr_reader :name
     attr_reader :logger
     attr_accessor :level
-    attr_reader :transform_block
+    attr_reader :message_transformer
     attr_reader :enabled
 
     # def initialize(logger, level)
@@ -12,17 +12,17 @@ module Output
     #   enable
     # end
 
-    def initialize(name, level, transform_block, logger)
+    def initialize(name, level, message_transformer, logger)
       @name = name
       @level = level
-      @transform_block = transform_block
+      @message_transformer = message_transformer
       @logger = logger
       enable
     end
 
-    def self.build(writer_name, level, transform_block, logger_level=Output::DEFAULT_LOGGER_LEVEL)
+    def self.build(writer_name, level, message_transformer, logger_level=Output::DEFAULT_LOGGER_LEVEL)
       logger = logger(writer_name, logger_level)
-      writer = new(writer_name, level, transform_block, logger)
+      writer = new(writer_name, level, message_transformer, logger)
     end
 
     def self.logger(name, level)
@@ -50,7 +50,7 @@ module Output
     end
 
     def write(message)
-      message = transform_block.call message
+      message = message_transformer.call message
       logger.send level, message if enabled?
     end
   end
