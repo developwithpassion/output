@@ -33,7 +33,7 @@ module Output
 
     if block_given?
       yield
-      level = pop_level
+      self.level = pop_level
     end
     
     level
@@ -50,10 +50,11 @@ module Output
       @logger_level ||= Output::DEFAULT_LOGGER_LEVEL
     end
 
-    def level(level=nil)
+    def logger_level=(level=nil)
       @logger_level = level unless level.nil?
       @logger_level
     end
+    alias :level :logger_level=
 
     def writers
       @writers ||= [].extend Writers

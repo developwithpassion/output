@@ -16,7 +16,7 @@ end
 
 title "Output Demo"
 
-level = SomeOutput.level
+level = SomeOutput.instance.level
 
 section "Logging level: #{level}" do
   SomeOutput.debug "Debug @ #{level}"
@@ -27,7 +27,7 @@ section "Logging level: #{level}" do
 end
 
 SomeOutput.push_level :debug do
-  level = SomeOutput.level
+  level = SomeOutput.instance.level
   heading "Logging level: #{level}"
   SomeOutput.debug "Debug @ #{level}"
 end
