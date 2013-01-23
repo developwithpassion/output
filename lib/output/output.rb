@@ -13,6 +13,9 @@ module Output
     base.extend ClassMethods
   end
 
+  # TODO needs to be called on "writers" instance method
+  # - uses writer_definitions class method to get names
+  # - collect writer instances for each name in writer_definitions
   def disable
     self.class.writers.disable
   end
@@ -21,14 +24,20 @@ module Output
     send method, message
   end
 
+  # TODO may not need to invoke against class directly
+  # implicit bubbling to class?
   def writer(name)
     send self.class.writer_accessor(name)
   end
 
+  # TODO may not need to invoke against class directly
+  # implicit bubbling to class?
   def level
     @level ||= self.class.logger_level
   end
 
+  # TODO may not need to invoke against class directly
+  # implicit bubbling to class?
   def level=(level)
     @level = level
     self.class.writers.logger_level = level
@@ -73,13 +82,11 @@ module Output
     end
     alias :level :logger_level=
 
-    def writers
-      @writers ||= {}.extend Writers
+    def writer_definitions
+      @writer_definitions ||= {}.extend Writers
     end
-    # TODO rename the method after redesign is done
-    alias :writer_definitions :writers
 
-    def writer(name, options = {}, &transform_block)
+    def writer_macro(name, options = {}, &transform_block)
       transform_block = transform_block || ->(message) { message } 
       level = options.fetch(:level, name)
 
@@ -94,6 +101,7 @@ module Output
 
       define_write_method name
     end
+    alias :writer :writer_macro
 
     def define_writer_accessor(definition)
       writer_name = definition.name
