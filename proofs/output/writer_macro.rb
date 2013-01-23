@@ -2,37 +2,56 @@ require_relative '../proofs_init'
 
 title 'Writer Macro'
 
-comment 'Adds writer parameters to list of writer parameters on the output class'
-comment 'Writer parameters include its name, level, and transform block'
-comment 'Define writer attribute'
+message_transformer = ->(message) { message }
 
-class SomeOutput
+SomeOutput = Class.new do
   include Output
   include Single
   include Setter::Settings
 
-  writer :some_writer, :level => :debug do |text|
-    text
-  end
+  level :info
+
+  writer :some_writer, :level => :debug, &message_transformer
 
   module Proof
+    def definition(name)
+      self.class.writer_definitions[name]
+    end
+
     def writer_defined?(name)
-      writer = self.class.writers[name]
-      not writer.nil?
+      not definition(name).nil?
+    end
+
+    def name?(name)
+      not definition(name).name.nil?
+    end
+
+    def level?(name, level)
+      definition(name).level == level
+    end
+
+    def message_transformer?(name, block)
+      definition(name).transform_block == block
     end
   end
 end
 
+heading 'A writer definition is created by the writer macro'
+
 output = SomeOutput.instance
 
 proof 'Writer definition is listed by name' do
-  comment 'Get definition from the Output class for the writer'
   output.prove { writer_defined? :some_writer }
 end
 
-proof 'Writer level is defined' do
+proof 'Name is part of the definition' do
+  output.prove { name? :some_writer }
 end
 
-comment 'The parameters should have been found for the name'
-comment 'The level should be checked'
-comment 'The block should be checked'
+proof 'Level is part of the definition' do
+  output.prove { level? :some_writer, :debug }
+end
+
+proof 'Message transformer is part of the definition' do
+  output.prove { message_transformer? :some_writer, message_transformer }
+end

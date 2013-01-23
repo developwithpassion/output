@@ -1,3 +1,11 @@
+require 'ostruct'
+
+class WriterDefinition < OpenStruct
+  def flatten
+    return name, level, transform_block
+  end
+end
+
 module Output
   DEFAULT_LOGGER_LEVEL = :info
 
@@ -14,7 +22,7 @@ module Output
   end
 
   def writer(name)
-    writer_accessor(name)
+    send self.class.writer_accessor(name)
   end
 
   def level
@@ -49,6 +57,11 @@ module Output
     level
   end
 
+  def build_writer(definition)
+    name, level, transform_block = definition.flatten
+    writer = Writer.build name, level, transform_block, self.level
+  end
+
   module ClassMethods
     def logger_level
       @logger_level ||= Output::DEFAULT_LOGGER_LEVEL
@@ -63,49 +76,59 @@ module Output
     def writers
       @writers ||= {}.extend Writers
     end
+    # TODO rename the method after redesign is done
+    alias :writer_definitions :writers
 
     def writer(name, options = {}, &transform_block)
-      # TODO construct writer definition
-      # make it an OpenStruct (require 'ostruct' fromRuby standard library)
-      
-      transform = transform_block || ->(message) { message } 
-
+      transform_block = transform_block || ->(message) { message } 
       level = options.fetch(:level, name)
 
-      writer = Writer.build(name, level, logger_level)
+      definition = WriterDefinition.new
+      definition.name = name
+      definition.level = level
+      definition.transform_block = transform_block
 
-      define_writer_accessor name, writer
+      writer_definitions[name] = definition
 
-      define_write_method name, writer, transform
+      define_writer_accessor definition
 
-      # TODO writers need to be on instance, not on class
-      writers[name] = writer
+      define_write_method name
     end
 
-    def define_writer_accessor(name, writer)
-      # TODO if setting, make the accessor a setting
-      # otherwise, it's just a plain old accessor
+    def define_writer_accessor(definition)
+      writer_name = definition.name
+      accessor_name = writer_accessor(writer_name)
+      var_name = :"@#{accessor_name}"
 
-      =begin
-        @some_writer ||= build_writer(name)
-        # needs 'build_writer' method on instance (defined above in Output module)
-        # build_writer method looks up the writer definition in class.writer_definitions (now called 'writers', but that will change)
-        # constructs a writer with the parameters found in the struct
-      =end
+      # TODO consider JP's design in regards to an "accessor" object (or module)
+      # to encapsulate the definition (generation) of the getter/setter methods
 
-      setting writer_accessor(name), writer
+      # TODO move to "define_setter" method
+      send :define_method, accessor_name do
+        writer = instance_variable_get var_name
+
+        unless writer
+          writer = build_writer(definition) unless writer
+          instance_variable_set var_name, writer
+        end
+
+        writer
+      end
+
+      # TODO move to "define_getter" method
+      send :define_method, "#{accessor_name}=" do |writer|
+        instance_variable_set var_name, writer
+        writers[name] = writer
+      end
     end
 
     def writer_accessor(name)
-      "#{name}_writer"
+      :"#{name}_writer"
     end
 
-    def define_write_method(name, writer, transform)
+    def define_write_method(name)
       send :define_method, name do |message|
-        message = transform.call message
-        # writer.write message
-        writer = send self.class.writer_accessor(name)
-        writer.write message
+        writer(name).write message
         message
       end
     end
