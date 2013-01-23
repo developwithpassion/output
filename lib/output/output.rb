@@ -13,6 +13,10 @@ module Output
     send method, message
   end
 
+  def writer(name)
+    writer_accessor(name)
+  end
+
   def level
     @level ||= self.class.logger_level
   end
@@ -71,16 +75,17 @@ module Output
 
       define_write_method name, writer, transform
 
+      # TODO writers need to be on instance, not on class
       writers << writer
     end
 
     def define_writer_accessor(name, writer)
       # TODO if setting, make the accessor a setting
       # otherwise, it's just a plain old accessor
-      setting accessor_name(name), writer
+      setting writer_accessor(name), writer
     end
 
-    def accessor_name(name)
+    def writer_accessor(name)
       "#{name}_writer"
     end
 
@@ -88,7 +93,7 @@ module Output
       send :define_method, name do |message|
         message = transform.call message
         # writer.write message
-        writer = send self.class.accessor_name(name)
+        writer = send self.class.writer_accessor(name)
         writer.write message
         message
       end
