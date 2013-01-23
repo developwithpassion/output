@@ -1,10 +1,18 @@
 module Output
   class Writer
+    attr_reader :name
     attr_reader :logger
     attr_accessor :level
     attr_reader :enabled
 
-    def initialize(logger, level)
+    # def initialize(logger, level)
+    #   @logger = logger
+    #   @level = level
+    #   enable
+    # end
+
+    def initialize(name, logger, level)
+      @name = name
       @logger = logger
       @level = level
       enable
@@ -12,7 +20,7 @@ module Output
 
     def self.build(writer_name, level, logger_level=Output::DEFAULT_LOGGER_LEVEL)
       logger = logger(writer_name, logger_level)
-      writer = new(logger, level)
+      writer = new(writer_name, logger, level)
     end
 
     def self.logger(name, level)
@@ -40,6 +48,13 @@ module Output
     end
 
     def write(message)
+      # puts
+      # puts "writer name: #{name}"
+      # puts "writer object: #{self.inspect}"
+      # puts "writer.write"
+      # puts "writer level: #{level}"
+      # puts "logger level: #{logger.level}"
+
       logger.send level, message if enabled?
     end
   end

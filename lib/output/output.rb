@@ -20,6 +20,7 @@ module Output
   def level=(level)
     @level = level
     self.class.writers.logger_level = level
+    level
   end
 
   def levels
@@ -27,7 +28,7 @@ module Output
   end
 
   def push_level(level)
-    levels.unshift level
+    levels.unshift self.level
     self.level = level
 
     if block_given?
@@ -73,16 +74,20 @@ module Output
     end
 
     def define_writer_accessor(name, writer)
-      accessor_name = "#{name}_writer"
-
       # TODO if setting, make the accessor a setting
       # otherwise, it's just a plain old accessor
-      setting accessor_name, writer
+      setting accessor_name(name), writer
+    end
+
+    def accessor_name(name)
+      "#{name}_writer"
     end
 
     def define_write_method(name, writer, transform)
       send :define_method, name do |message|
         message = transform.call message
+        # writer.write message
+        writer = send self.class.accessor_name(name)
         writer.write message
         message
       end

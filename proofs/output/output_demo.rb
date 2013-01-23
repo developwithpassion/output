@@ -5,7 +5,29 @@ class SomeOutput
   include Single
   include Setter::Settings
 
-  writer :message, :level => :info
+  level :info
+
+  writer :debug, :level => :debug
+  writer :info, :level => :info
+  writer :warn, :level => :warn
+  writer :error, :level => :error
+  writer :fatal, :level => :fatal
 end
 
-SomeOutput.message "This writes a message to STDOUT"
+title "Output Demo"
+
+level = SomeOutput.level
+
+section "Logging level: #{level}" do
+  SomeOutput.debug "Debug @ #{level}"
+  SomeOutput.info "Info @ #{level}"
+  SomeOutput.warn "Warn @ #{level}"
+  SomeOutput.error "Error @ #{level}"
+  SomeOutput.fatal "Fatal @ #{level}"
+end
+
+SomeOutput.push_level :debug do
+  level = SomeOutput.level
+  heading "Logging level: #{level}"
+  SomeOutput.debug "Debug @ #{level}"
+end
