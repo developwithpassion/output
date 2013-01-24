@@ -11,11 +11,8 @@ module Output
     base.extend ClassMethods
   end
 
-  # TODO needs to be called on "writers" instance method
-  # - uses writer_definitions class method to get names
-  # - collect writer instances for each name in writer_definitions
   def disable
-    self.class.writers.disable
+    each_writer { |w| w.disable }
   end
 
   def write(method, message)
@@ -32,7 +29,9 @@ module Output
 
   def level=(level)
     @level = level
-    self.class.writers.logger_level = level
+
+    each_writer { |w| w.logger_level = level }
+
     level
   end
 
@@ -63,12 +62,11 @@ module Output
     writer = Writer.build name, level, message_transformer, self.level
   end
 
-  def writers
-    writers = self.class.writer_names.collect do |name|
-      send self.class.writer_accessor(name)
+  def each_writer
+    self.class.writer_names.each do |name|
+      writer = send self.class.writer_accessor(name)
+      yield writer
     end
-
-    writers.extend Writers
   end
 
   module ClassMethods
@@ -134,7 +132,7 @@ module Output
       var_name = :"@#{accessor_name}"
 
       send :define_method, "#{accessor_name}=" do |writer|
-        writer.logger.level = self.class.logger_level
+        writer.logger_level = self.class.logger_level
         instance_variable_set var_name, writer
         writer
       end

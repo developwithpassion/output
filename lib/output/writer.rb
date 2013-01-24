@@ -1,7 +1,6 @@
 module Output
   class Writer
     attr_reader :name
-    attr_reader :logger
     attr_accessor :level
     attr_reader :message_transformer
     attr_reader :enabled
@@ -15,11 +14,11 @@ module Output
     end
 
     def self.build(writer_name, level=Output::DEFAULT_LOGGER_LEVEL, message_transformer=nil, logger_level=Output::DEFAULT_LOGGER_LEVEL)
-      logger = logger(writer_name, logger_level)
+      logger = build_logger(writer_name, logger_level)
       writer = new(writer_name, level, message_transformer, logger)
     end
 
-    def self.logger(name, level)
+    def self.build_logger(name, level)
       logger = Logging.logger[name.to_s]
       logger.level = level
 
@@ -43,9 +42,17 @@ module Output
       @enabled
     end
 
+    def logger_level
+      @logger.level
+    end
+
+    def logger_level=(level)
+      @logger.level = level
+    end
+
     def write(message)
       message = message_transformer.call message
-      logger.send level, message if enabled?
+      @logger.send level, message if enabled?
     end
   end
 end
