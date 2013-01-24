@@ -7,8 +7,6 @@ class WriterDefinition < OpenStruct
 end
 
 module Output
-  DEFAULT_LOGGER_LEVEL = :info
-
   def self.included(base)
     base.extend ClassMethods
   end
@@ -24,20 +22,14 @@ module Output
     send method, message
   end
 
-  # TODO may not need to invoke against class directly
-  # implicit bubbling to class?
   def writer(name)
     send self.class.writer_accessor(name)
   end
 
-  # TODO may not need to invoke against class directly
-  # implicit bubbling to class?
   def level
     @level ||= self.class.logger_level
   end
 
-  # TODO may not need to invoke against class directly
-  # implicit bubbling to class?
   def level=(level)
     @level = level
     self.class.writers.logger_level = level
@@ -71,6 +63,14 @@ module Output
     writer = Writer.build name, level, message_transformer, self.level
   end
 
+  def writers
+    writers = self.class.writer_names.collect do |name|
+      send self.class.writer_accessor(name)
+    end
+
+    writers.extend Writers
+  end
+
   module ClassMethods
     def logger_level
       @logger_level ||= Output::DEFAULT_LOGGER_LEVEL
@@ -83,7 +83,11 @@ module Output
     alias :level :logger_level=
 
     def writer_definitions
-      @writer_definitions ||= {}.extend Writers
+      @writer_definitions ||= {}
+    end
+
+    def writer_names
+      writer_definitions.keys
     end
 
     def writer_macro(name, options = {}, &message_transformer)
@@ -125,12 +129,13 @@ module Output
     end
 
     def define_writer_setter(definition)
-      accessor_name = writer_accessor(definition.name)
+      writer_name = definition.name
+      accessor_name = writer_accessor(writer_name)
       var_name = :"@#{accessor_name}"
 
       send :define_method, "#{accessor_name}=" do |writer|
+        writer.logger.level = self.class.logger_level
         instance_variable_set var_name, writer
-        writers[name] = writer
         writer
       end
     end
