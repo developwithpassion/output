@@ -7,11 +7,8 @@ message_transformer = ->(message) { message }
 SomeOutput = Class.new do
   include Output
   include Single
-  include Setter::Settings
 
-  level :info
-
-  writer :some_writer, :level => :debug, &message_transformer
+  writer :something, :level => :debug, &message_transformer
 
   module Proof
     def definition(name)
@@ -31,7 +28,7 @@ SomeOutput = Class.new do
     end
 
     def message_transformer?(name, block)
-      definition(name).transform_block == block
+      definition(name).message_transformer == block
     end
   end
 end
@@ -41,17 +38,17 @@ heading 'A writer definition is created by the writer macro'
 output = SomeOutput.instance
 
 proof 'Writer definition is listed by name' do
-  output.prove { writer_defined? :some_writer }
+  output.prove { writer_defined? :something }
 end
 
 proof 'Name is part of the definition' do
-  output.prove { name? :some_writer }
+  output.prove { name? :something }
 end
 
 proof 'Level is part of the definition' do
-  output.prove { level? :some_writer, :debug }
+  output.prove { level? :something, :debug }
 end
 
 proof 'Message transformer is part of the definition' do
-  output.prove { message_transformer? :some_writer, message_transformer }
+  output.prove { message_transformer? :something, message_transformer }
 end

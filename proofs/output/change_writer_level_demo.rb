@@ -1,31 +1,48 @@
 require_relative '../proofs_init'
 
-class SomeOutput
-  include Output
-  include Single
-  include Setter::Settings
+title "Changing an Output Object's Level"
 
-  level :info
+module ChangeWriterLevel
+  class Output
+    include ::Output
+    include Single
 
-  writer :details, :level => :debug
+    level :info
+
+    writer :something, :level => :debug
+
+    module Proof
+      def writes?(message)
+        something message
+      end
+    end
+  end
 end
 
-output = SomeOutput.instance
-writer = output.details_writer
+log_level_docs = <<-docs
+  Log Levels:
+  -----------
+  * Fatal: shows messages at a FATAL level only
+  * Error: Shows messages classified as ERROR and FATAL
+  * Warning: Shows messages classified as WARNING, ERROR, and FATAL
+  * Info: Shows messages classified as INFO, WARNING, ERROR, and FATAL
+  * Debug: Shows messages classified as DEBUG, INFO, WARNING, ERROR, and FATAL
+docs
 
-# Writer: debug
-# Logger: debug
-# => should write
+heading log_level_docs
 
-# puts writer.logger.level # => :info
-output.details "This doesn't write because the writer is :debug and the logger is :info"
+heading "Writers write when the output object's level is inclusive of the writer's level" do
+  comment "TODO Proofs can be written once the Proof library output object uses a StringIo appender"
+end
 
-# Goal
-# Get logger to info, so writing at debug doesn't write
+output = ChangeWriterLevel::Output.instance
+writer = output.something_writer
 
-# Express: Only want system to write at info
-# => means: all loggers set to info
+proof "Writer doesn't write when it's level is lower than the output's level" do
+  output.prove { writes? "\> This doesn't write because the writer is :debug and the logger is :info" }
+end
 
-output.level = :debug
-# puts writer.logger.level
-output.details "This writes because the writer is :debug and the logger is :debug"
+proof "Writer writes when it's level is equal or greater than the output's level" do
+  output.level = :debug
+  output.prove { writes? "\> This writes because the writer is :debug and the logger is :debug" }
+end

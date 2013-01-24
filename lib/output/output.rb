@@ -2,17 +2,18 @@ require 'ostruct'
 
 class WriterDefinition < OpenStruct
   def flatten
-    return name, level, transform_block
+    return name, level, message_transformer
   end
 end
 
 module Output
-  DEFAULT_LOGGER_LEVEL = :info
-
   def self.included(base)
     base.extend ClassMethods
   end
 
+  # TODO needs to be called on "writers" instance method
+  # - uses writer_definitions class method to get names
+  # - collect writer instances for each name in writer_definitions
   def disable
     self.class.writers.disable
   end
@@ -57,9 +58,17 @@ module Output
     level
   end
 
-  def build_writer(definition)
-    name, level, transform_block = definition.flatten
-    writer = Writer.build name, level, transform_block, self.level
+  def build_writer(writer_definition)
+    name, level, message_transformer = writer_definition.flatten
+    writer = Writer.build name, level, message_transformer, self.level
+  end
+
+  def writers
+    writers = self.class.writer_names.collect do |name|
+      send self.class.writer_accessor(name)
+    end
+
+    writers.extend Writers
   end
 
   module ClassMethods
@@ -73,20 +82,22 @@ module Output
     end
     alias :level :logger_level=
 
-    def writers
-      @writers ||= {}.extend Writers
+    def writer_definitions
+      @writer_definitions ||= {}
     end
-    # TODO rename the method after redesign is done
-    alias :writer_definitions :writers
 
-    def writer(name, options = {}, &transform_block)
-      transform_block = transform_block || ->(message) { message } 
+    def writer_names
+      writer_definitions.keys
+    end
+
+    def writer_macro(name, options = {}, &message_transformer)
+      message_transformer = message_transformer || ->(message) { message } 
       level = options.fetch(:level, name)
 
       definition = WriterDefinition.new
       definition.name = name
       definition.level = level
-      definition.transform_block = transform_block
+      definition.message_transformer = message_transformer
 
       writer_definitions[name] = definition
 
@@ -94,16 +105,17 @@ module Output
 
       define_write_method name
     end
+    alias :writer :writer_macro
 
     def define_writer_accessor(definition)
-      writer_name = definition.name
-      accessor_name = writer_accessor(writer_name)
+      define_writer_getter(definition)
+      define_writer_setter(definition)
+    end
+
+    def define_writer_getter(definition)
+      accessor_name = writer_accessor(definition.name)
       var_name = :"@#{accessor_name}"
 
-      # TODO consider JP's design in regards to an "accessor" object (or module)
-      # to encapsulate the definition (generation) of the getter/setter methods
-
-      # TODO move to "define_setter" method
       send :define_method, accessor_name do
         writer = instance_variable_get var_name
 
@@ -114,11 +126,17 @@ module Output
 
         writer
       end
+    end
 
-      # TODO move to "define_getter" method
+    def define_writer_setter(definition)
+      writer_name = definition.name
+      accessor_name = writer_accessor(writer_name)
+      var_name = :"@#{accessor_name}"
+
       send :define_method, "#{accessor_name}=" do |writer|
+        writer.logger.level = self.class.logger_level
         instance_variable_set var_name, writer
-        writers[name] = writer
+        writer
       end
     end
 
