@@ -14,10 +14,6 @@ docs
 
 heading log_level_docs
 
-heading "Writers write when the output object's level is inclusive of the writer's level" do
-  comment "TODO Proofs can be written once the Proof library output object uses a StringIo appender"
-end
-
 module ChangeWriterLevel
   class Output
     include ::Output
@@ -34,6 +30,10 @@ module ChangeWriterLevel
       end
     end
   end
+end
+
+heading "Writers write when the output object's level is inclusive of the writer's level" do
+  comment "TODO Proofs can be written once the Proof library output object uses a StringIo appender"
 end
 
 output = ChangeWriterLevel::Output.instance
