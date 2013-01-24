@@ -1,20 +1,34 @@
 require_relative '../proofs_init'
-require_relative './some_output'
 
 title "Output Demo"
 
-level = SomeOutput.instance.level
+module OutputDemo
+  class Output
+    include ::Output
+    include Single
 
-section "Logging level: #{level}" do
-  SomeOutput.debug "Debug @ #{level}"
-  SomeOutput.info "Info @ #{level}"
-  SomeOutput.warn "Warn @ #{level}"
-  SomeOutput.error "Error @ #{level}"
-  SomeOutput.fatal "Fatal @ #{level}"
+    level :info
+
+    writer :debug, :level => :debug
+    writer :info, :level => :info
+    writer :warn, :level => :warn
+    writer :error, :level => :error
+    writer :fatal, :level => :fatal
+  end
 end
 
-SomeOutput.push_level :debug do
-  level = SomeOutput.instance.level
+level = OutputDemo::Output.instance.level
+
+section "Logging level: #{level}" do
+  OutputDemo::Output.debug "Debug @ #{level}"
+  OutputDemo::Output.info "Info @ #{level}"
+  OutputDemo::Output.warn "Warn @ #{level}"
+  OutputDemo::Output.error "Error @ #{level}"
+  OutputDemo::Output.fatal "Fatal @ #{level}"
+end
+
+OutputDemo::Output.push_level :debug do
+  level = OutputDemo::Output.instance.level
   heading "Logging level: #{level}"
-  SomeOutput.debug "Debug @ #{level}"
+  OutputDemo::Output.debug "Debug @ #{level}"
 end

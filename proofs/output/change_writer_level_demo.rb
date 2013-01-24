@@ -1,23 +1,6 @@
 require_relative '../proofs_init'
 
-title "Changing an Output Object's Level"
-
-module ChangeWriterLevel
-  class Output
-    include ::Output
-    include Single
-
-    level :info
-
-    writer :something, :level => :debug
-
-    module Proof
-      def writes?(message)
-        something message
-      end
-    end
-  end
-end
+title "Change Writer Level Demo"
 
 log_level_docs = <<-docs
   Log Levels:
@@ -35,8 +18,25 @@ heading "Writers write when the output object's level is inclusive of the writer
   comment "TODO Proofs can be written once the Proof library output object uses a StringIo appender"
 end
 
+module ChangeWriterLevel
+  class Output
+    include ::Output
+    include Single
+
+    level :info
+
+    writer :something, :level => :debug
+
+    module Proof
+      def writes?(message)
+        something message
+        true
+      end
+    end
+  end
+end
+
 output = ChangeWriterLevel::Output.instance
-writer = output.something_writer
 
 proof "Writer doesn't write when it's level is lower than the output's level" do
   output.prove { writes? "\> This doesn't write because the writer is :debug and the logger is :info" }
