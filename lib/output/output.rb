@@ -57,10 +57,13 @@ module Output
     level
   end
 
-  def build_writer(writer_definition)
-    name, level, message_transformer = writer_definition.flatten
+  def build_writer(name, level, message_transformer)
     logger_name = Writer::Naming.fully_qualified(self.class, name)
     writer = Writer.build name, level, message_transformer, self.level, logger_name
+  end
+
+  def build_writer_(definition)
+    build_writer *definition.flatten
   end
 
   def each_writer
@@ -119,7 +122,7 @@ module Output
         writer = instance_variable_get var_name
 
         unless writer
-          writer = build_writer(definition) unless writer
+          writer = build_writer_(definition) unless writer
           instance_variable_set var_name, writer
         end
 

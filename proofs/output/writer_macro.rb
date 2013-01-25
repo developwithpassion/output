@@ -1,54 +1,84 @@
 require_relative '../proofs_init'
+require 'ostruct'
 
-title 'Writer Macro'
+title "Writer Macro"
 
-message_transformer = ->(message) { message }
+module Macro
+  class Output
+    include ::Output
+    include Single
 
-SomeOutput = Class.new do
-  include Output
-  include Single
-
-  writer :something, :level => :debug, &message_transformer
-
-  module Proof
-    def definition(name)
-      self.class.writer_definitions[name]
-    end
-
-    def writer_defined?(name)
-      not definition(name).nil?
-    end
-
-    def name?(name)
-      not definition(name).name.nil?
-    end
-
-    def level?(name, level)
-      definition(name).level == level
-    end
-
-    def message_transformer?(name, block)
-      definition(name).message_transformer == block
+    module Proof
+      def writer_getter?(name)
+        respond_to? name
+      end
     end
   end
 end
 
-heading 'A writer definition is created by the writer macro'
+module Output
+  class WriterMacro
+    module Proof
+      def attribute_properties?(name, properties)
+        properties == self.class.attribute_properties(name)
+      end
 
-output = SomeOutput.instance
+      def getter?(name)
+        output.respond_to? name
+      end
 
-proof 'Writer definition is listed by name' do
-  output.prove { writer_defined? :something }
+      def setter?(name)
+        output.respond_to? :"#{name}="
+      end
+
+      def gets?(name, writer)
+        output.send(name) == writer
+      end
+
+      def created_lazily?(name)
+        define_getter
+        originally = output.instance_variable_get(:"@#{name}")
+        output.send name
+        presently = output.instance_variable_get("@#{name}")
+        originally.nil? and not presently.nil?
+      end
+    end
+  end
 end
 
-proof 'Name is part of the definition' do
-  output.prove { name? :something }
+output = Macro::Output.instance
+macro = Output::WriterMacro.new output, :something, :debug, ->(text) {text}
+
+proof "Attribute's properties are it's name and the backing variable name" do
+  macro.prove { attribute_properties? :something, [:something_writer, :@something_writer] }
 end
 
-proof 'Level is part of the definition' do
-  output.prove { level? :something, :debug }
+proof "Defines a getter for the writer" do
+  macro.define_getter
+  macro.prove { getter? :something_writer }
 end
 
-proof 'Message transformer is part of the definition' do
-  output.prove { message_transformer? :something, message_transformer }
+proof "Defines a setter for the writer" do
+  macro.define_setter
+  macro.prove { setter? :something_writer }
+end
+
+proof "Access to writers is provided by their getters" do
+  output_writer = output.instance_variable_get :@something_writer
+
+  some_writer = OpenStruct.new
+  output.instance_variable_set :@something_writer, some_writer
+
+  macro.prove { gets? :something_writer, some_writer }
+
+  output.instance_variable_set :@something_writer, output_writer
+end
+
+proof "Writers are created lazily upon access of their getters" do
+  output_writer = output.instance_variable_get :@something_writer
+
+  output.instance_variable_set :@something_writer, nil
+  macro.prove { created_lazily? :something_writer }
+
+  output.instance_variable_set :@something_writer, output_writer
 end
