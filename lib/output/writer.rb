@@ -44,7 +44,8 @@ module Output
     end
 
     def logger_level
-      @logger.level
+      # TODO convert to logger symbol from number
+      Util.log_level @logger.level
     end
 
     def logger_level=(level)
@@ -77,6 +78,14 @@ module Output
         attribute_name = :"#{name}_writer"
         var_name = :"@#{attribute_name}"
         return attribute_name, var_name
+      end
+    end
+
+    module Util
+      def log_level(number)
+        return case number
+          when 0 ...
+        end
       end
     end
   end

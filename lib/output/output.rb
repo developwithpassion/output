@@ -17,9 +17,10 @@ module Output
     send self.class.writer_attribute(name)
   end
 
-  def build_writer(name, level, message_transformer)
+  def build_writer(name, level, message_transformer=nil)
     logger_name = Writer::Naming.fully_qualified(self.class, name)
     writer = Writer.build name, level, message_transformer, self.level, logger_name
+    writer
   end
 
   def each_writer
