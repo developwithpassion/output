@@ -59,7 +59,8 @@ module Output
 
   def build_writer(writer_definition)
     name, level, message_transformer = writer_definition.flatten
-    writer = Writer.build name, level, message_transformer, self.level
+    logger_name = Writer::Naming.fully_qualified(self.class, name)
+    writer = Writer.build name, level, message_transformer, self.level, logger_name
   end
 
   def each_writer
