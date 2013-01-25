@@ -1,12 +1,4 @@
-require 'ostruct'
-
 module Output
-  class WriterDefinition < OpenStruct
-    def flatten
-      return name, level, message_transformer
-    end
-  end
-
   class Writer
     attr_reader :name
     attr_accessor :level
