@@ -1,12 +1,12 @@
 module Output
   class WriterMacro
-    attr_reader :output
+    attr_reader :output_class
     attr_reader :name
     attr_reader :level
     attr_reader :message_transformer
 
-    def initialize(output, name, level, message_transformer=nil)
-      @output = output
+    def initialize(output_class, name, level, message_transformer=nil)
+      @output_class = output_class
       @name = name
       @level = level
       @message_transformer
@@ -19,7 +19,7 @@ module Output
 
       attribute_name, var_name = self.class.attribute_properties(name)
 
-      output.define_singleton_method attribute_name do
+      output_class.send :define_method, attribute_name do
         writer = instance_variable_get var_name
 
         unless writer
@@ -34,7 +34,7 @@ module Output
     def define_setter
       attribute_name, var_name = self.class.attribute_properties(name)
 
-      output.define_singleton_method "#{attribute_name}=" do |writer|
+      output_class.send :define_method, "#{attribute_name}=" do |writer|
         writer.logger_level = level
         instance_variable_set var_name, writer
         writer

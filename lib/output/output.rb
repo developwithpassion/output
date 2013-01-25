@@ -103,6 +103,8 @@ module Output
 
       writer_definitions[name] = definition
 
+      # macro = WriterMacro.new self, name, level, message_transformer
+
       define_writer_accessor definition
 
       define_write_method name

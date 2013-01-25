@@ -6,7 +6,6 @@ title "Writer Macro"
 module Macro
   class Output
     include ::Output
-    include Single
   end
 end
 
@@ -18,14 +17,16 @@ module Output
       end
 
       def getter?(name)
-        output.respond_to? name
+        output_class.method_defined? name
       end
 
       def setter?(name)
-        output.respond_to? :"#{name}="
+        output_class.method_defined? :"#{name}="
       end
 
       def gets?(name, writer)
+        output = Macro::Output.new
+
         output_writer = output.instance_variable_get :@something_writer
         output.instance_variable_set :@something_writer, writer
 
@@ -37,6 +38,8 @@ module Output
       end
 
       def sets?(name, writer)
+        output = Macro::Output.new
+
         output_writer = output.instance_variable_get :@something_writer
 
         output.send :"#{name}=", writer
@@ -49,6 +52,8 @@ module Output
 
       def created_lazily?(name)
         define_getter
+
+        output = Macro::Output.new
 
         output_writer = output.instance_variable_get :"@#{name}"
         output.instance_variable_set :"@#{name}", nil
@@ -67,8 +72,7 @@ module Output
   end
 end
 
-output = Macro::Output.instance
-macro = Output::WriterMacro.new output, :something, :debug, ->(text) {text}
+macro = Output::WriterMacro.new Macro::Output, :something, :debug, ->(text) {text}
 
 proof "Attribute's properties are it's name and the backing variable name" do
   macro.prove { attribute_properties? :something, [:something_writer, :@something_writer] }
