@@ -26,20 +26,42 @@ module Output
       end
 
       def gets?(name, writer)
-        output.send(name) == writer
+        output_writer = output.instance_variable_get :@something_writer
+        output.instance_variable_set :@something_writer, writer
+
+        proven = output.send(name) == writer
+
+        output.instance_variable_set :@something_writer, output_writer
+
+        proven
       end
 
       def sets?(name, writer)
+        output_writer = output.instance_variable_get :@something_writer
+
         output.send :"#{name}=", writer
-        output.instance_variable_get(:"@#{name}") == writer
+        proven = output.instance_variable_get(:"@#{name}") == writer
+
+        output.instance_variable_set :@something_writer, output_writer
+
+        proven
       end
 
       def created_lazily?(name)
         define_getter
-        originally = output.instance_variable_get(:"@#{name}")
+
+        output_writer = output.instance_variable_get :"@#{name}"
+        output.instance_variable_set :"@#{name}", nil
+
         output.send name
+
         presently = output.instance_variable_get("@#{name}")
-        originally.nil? and not presently.nil?
+
+        proven = !presently.nil?
+
+        output.instance_variable_set :@something_writer, output_writer
+
+        proven
       end
     end
   end
@@ -63,31 +85,15 @@ proof "Defines a setter for the writer" do
 end
 
 proof "Access to writers is provided by their getters" do
-  output_writer = output.instance_variable_get :@something_writer
-
   some_writer = OpenStruct.new
-  output.instance_variable_set :@something_writer, some_writer
-
   macro.prove { gets? :something_writer, some_writer }
-
-  output.instance_variable_set :@something_writer, output_writer
 end
 
-proof "Writers are created lazily upon access of their getters" do
-  output_writer = output.instance_variable_get :@something_writer
-
-  output.instance_variable_set :@something_writer, nil
+proof "Writers are assigned lazily upon access of their getters" do
   macro.prove { created_lazily? :something_writer }
-
-  output.instance_variable_set :@something_writer, output_writer
 end
 
 proof "Assignment of writers is provided by their setters" do
-  output_writer = output.instance_variable_get :@something_writer
-
   some_writer = OpenStruct.new
-
   macro.prove { sets? :something_writer, some_writer }
-
-  output.instance_variable_set :@something_writer, output_writer
 end
