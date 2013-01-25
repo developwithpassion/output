@@ -53,6 +53,7 @@ module Output
     end
 
     def define_write_method
+      name = self.name
       output_class.send :define_method, name do |message|
         writer(name).write message
         message

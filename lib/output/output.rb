@@ -1,12 +1,6 @@
 require 'ostruct'
 
 module Output
-  class WriterDefinition < OpenStruct
-    def flatten
-      return name, level, message_transformer
-    end
-  end
-
   def self.included(base)
     base.extend ClassMethods
   end
@@ -62,12 +56,8 @@ module Output
     writer = Writer.build name, level, message_transformer, self.level, logger_name
   end
 
-  def build_writer_(definition)
-    build_writer *definition.flatten
-  end
-
   def each_writer
-    self.class.writer_names.each do |name|
+    self.class.writers.each do |name|
       writer = send self.class.writer_accessor(name)
       yield writer
     end
@@ -84,27 +74,14 @@ module Output
     end
     alias :level :logger_level=
 
-    def writer_definitions
-      @writer_definitions ||= {}
-    end
-
-    def writer_names
-      writer_definitions.keys
+    def writers
+      @writers ||= []
     end
 
     def writer_macro(name, options = {}, &message_transformer)
       level = options.fetch(:level, name)
-
-      definition = WriterDefinition.new
-      definition.name = name
-      definition.level = level
-      definition.message_transformer = message_transformer
-
-      writer_definitions[name] = definition
-
       WriterMacro.define_writer self, name, level, message_transformer
-
-      define_write_method name
+      writers << name
     end
     alias :writer :writer_macro
 
