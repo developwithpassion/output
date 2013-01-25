@@ -9,7 +9,12 @@ module Output
       @output_class = output_class
       @name = name
       @level = level
-      @message_transformer
+      @message_transformer = message_transformer
+    end
+
+    def define_writer_accessor
+      define_getter
+      define_setter
     end
 
     def define_getter

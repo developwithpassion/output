@@ -93,7 +93,6 @@ module Output
     end
 
     def writer_macro(name, options = {}, &message_transformer)
-      message_transformer = message_transformer || ->(message) { message } 
       level = options.fetch(:level, name)
 
       definition = WriterDefinition.new
@@ -103,47 +102,16 @@ module Output
 
       writer_definitions[name] = definition
 
-      # macro = WriterMacro.new self, name, level, message_transformer
+      macro = WriterMacro.new self, name, level, message_transformer
+      macro.define_writer_accessor
 
-      define_writer_accessor definition
+      # define_writer_accessor definition
 
       define_write_method name
     end
     alias :writer :writer_macro
 
-    def define_writer_accessor(definition)
-      define_writer_getter(definition)
-      define_writer_setter(definition)
-    end
-
-    def define_writer_getter(definition)
-      accessor_name = writer_accessor(definition.name)
-      var_name = :"@#{accessor_name}"
-
-      send :define_method, accessor_name do
-        writer = instance_variable_get var_name
-
-        unless writer
-          writer = build_writer_(definition) unless writer
-          instance_variable_set var_name, writer
-        end
-
-        writer
-      end
-    end
-
-    def define_writer_setter(definition)
-      writer_name = definition.name
-      accessor_name = writer_accessor(writer_name)
-      var_name = :"@#{accessor_name}"
-
-      send :define_method, "#{accessor_name}=" do |writer|
-        writer.logger_level = self.class.logger_level
-        instance_variable_set var_name, writer
-        writer
-      end
-    end
-
+    # TODO this is now coded here, and in WriterMacro
     def writer_accessor(name)
       :"#{name}_writer"
     end
