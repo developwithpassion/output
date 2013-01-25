@@ -102,10 +102,7 @@ module Output
 
       writer_definitions[name] = definition
 
-      macro = WriterMacro.new self, name, level, message_transformer
-      macro.define_writer_accessor
-
-      # define_writer_accessor definition
+      WriterMacro.define_writer self, name, level, message_transformer
 
       define_write_method name
     end
@@ -114,13 +111,6 @@ module Output
     # TODO this is now coded here, and in WriterMacro
     def writer_accessor(name)
       :"#{name}_writer"
-    end
-
-    def define_write_method(name)
-      send :define_method, name do |message|
-        writer(name).write message
-        message
-      end
     end
   end
 end

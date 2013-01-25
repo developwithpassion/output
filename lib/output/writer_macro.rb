@@ -5,6 +5,11 @@ module Output
     attr_reader :level
     attr_reader :message_transformer
 
+    def self.define_writer(output_class, name, level, message_transformer)
+      macro = new output_class, name, level, message_transformer
+      macro.define_writer
+    end
+
     def initialize(output_class, name, level, message_transformer=nil)
       @output_class = output_class
       @name = name
@@ -12,9 +17,10 @@ module Output
       @message_transformer = message_transformer
     end
 
-    def define_writer_accessor
+    def define_writer
       define_getter
       define_setter
+      define_write_method
     end
 
     def define_getter
@@ -43,6 +49,13 @@ module Output
         writer.logger_level = level
         instance_variable_set var_name, writer
         writer
+      end
+    end
+
+    def define_write_method
+      output_class.send :define_method, name do |message|
+        writer(name).write message
+        message
       end
     end
 

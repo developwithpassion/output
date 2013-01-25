@@ -24,6 +24,10 @@ module Output
         output_class.method_defined? :"#{name}="
       end
 
+      def writes?(name)
+        output_class.method_defined? name
+      end
+
       def gets?(name, writer)
         output = Macro::Output.new
 
@@ -86,6 +90,11 @@ end
 proof "Defines a setter for the writer" do
   macro.define_setter
   macro.prove { setter? :something_writer }
+end
+
+proof "Defines the write method for the writer" do
+  macro.define_write_method
+  macro.prove { writes? :something }
 end
 
 proof "Access to writers is provided by their getters" do
