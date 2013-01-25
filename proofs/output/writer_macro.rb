@@ -7,12 +7,6 @@ module Macro
   class Output
     include ::Output
     include Single
-
-    module Proof
-      def writer_getter?(name)
-        respond_to? name
-      end
-    end
   end
 end
 
@@ -33,6 +27,11 @@ module Output
 
       def gets?(name, writer)
         output.send(name) == writer
+      end
+
+      def sets?(name, writer)
+        output.send :"#{name}=", writer
+        output.instance_variable_get(:"@#{name}") == writer
       end
 
       def created_lazily?(name)
@@ -79,6 +78,16 @@ proof "Writers are created lazily upon access of their getters" do
 
   output.instance_variable_set :@something_writer, nil
   macro.prove { created_lazily? :something_writer }
+
+  output.instance_variable_set :@something_writer, output_writer
+end
+
+proof "Assignment of writers is provided by their setters" do
+  output_writer = output.instance_variable_get :@something_writer
+
+  some_writer = OpenStruct.new
+
+  macro.prove { sets? :something_writer, some_writer }
 
   output.instance_variable_set :@something_writer, output_writer
 end
