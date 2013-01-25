@@ -57,10 +57,13 @@ module Output
     level
   end
 
-  def build_writer(writer_definition)
-    name, level, message_transformer = writer_definition.flatten
+  def build_writer(name, level, message_transformer)
     logger_name = Writer::Naming.fully_qualified(self.class, name)
     writer = Writer.build name, level, message_transformer, self.level, logger_name
+  end
+
+  def build_writer_(definition)
+    build_writer *definition.flatten
   end
 
   def each_writer
@@ -90,7 +93,6 @@ module Output
     end
 
     def writer_macro(name, options = {}, &message_transformer)
-      message_transformer = message_transformer || ->(message) { message } 
       level = options.fetch(:level, name)
 
       definition = WriterDefinition.new
@@ -100,54 +102,15 @@ module Output
 
       writer_definitions[name] = definition
 
-      define_writer_accessor definition
+      WriterMacro.define_writer self, name, level, message_transformer
 
       define_write_method name
     end
     alias :writer :writer_macro
 
-    def define_writer_accessor(definition)
-      define_writer_getter(definition)
-      define_writer_setter(definition)
-    end
-
-    def define_writer_getter(definition)
-      accessor_name = writer_accessor(definition.name)
-      var_name = :"@#{accessor_name}"
-
-      send :define_method, accessor_name do
-        writer = instance_variable_get var_name
-
-        unless writer
-          writer = build_writer(definition) unless writer
-          instance_variable_set var_name, writer
-        end
-
-        writer
-      end
-    end
-
-    def define_writer_setter(definition)
-      writer_name = definition.name
-      accessor_name = writer_accessor(writer_name)
-      var_name = :"@#{accessor_name}"
-
-      send :define_method, "#{accessor_name}=" do |writer|
-        writer.logger_level = self.class.logger_level
-        instance_variable_set var_name, writer
-        writer
-      end
-    end
-
+    # TODO this is now coded here, and in WriterMacro
     def writer_accessor(name)
       :"#{name}_writer"
-    end
-
-    def define_write_method(name)
-      send :define_method, name do |message|
-        writer(name).write message
-        message
-      end
     end
   end
 end

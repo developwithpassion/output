@@ -56,7 +56,7 @@ module Output
     end
 
     def write(message)
-      message = message_transformer.call message
+      message = message_transformer.call message if message_transformer
       @logger.send level, message if enabled?
     end
 

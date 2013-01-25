@@ -1,54 +1,112 @@
 require_relative '../proofs_init'
+require 'ostruct'
 
-title 'Writer Macro'
+title "Writer Macro"
 
-message_transformer = ->(message) { message }
+module Macro
+  class Output
+    include ::Output
+  end
+end
 
-SomeOutput = Class.new do
-  include Output
-  include Single
+module Output
+  class WriterMacro
+    module Proof
+      def attribute_properties?(name, properties)
+        properties == self.class.attribute_properties(name)
+      end
 
-  writer :something, :level => :debug, &message_transformer
+      def getter?(name)
+        output_class.method_defined? name
+      end
 
-  module Proof
-    def definition(name)
-      self.class.writer_definitions[name]
-    end
+      def setter?(name)
+        output_class.method_defined? :"#{name}="
+      end
 
-    def writer_defined?(name)
-      not definition(name).nil?
-    end
+      def writes?(name)
+        output_class.method_defined? name
+      end
 
-    def name?(name)
-      not definition(name).name.nil?
-    end
+      def gets?(name, writer)
+        output = Macro::Output.new
 
-    def level?(name, level)
-      definition(name).level == level
-    end
+        output_writer = output.instance_variable_get :@something_writer
+        output.instance_variable_set :@something_writer, writer
 
-    def message_transformer?(name, block)
-      definition(name).message_transformer == block
+        proven = output.send(name) == writer
+
+        output.instance_variable_set :@something_writer, output_writer
+
+        proven
+      end
+
+      def sets?(name, writer)
+        output = Macro::Output.new
+
+        output_writer = output.instance_variable_get :@something_writer
+
+        output.send :"#{name}=", writer
+        proven = output.instance_variable_get(:"@#{name}") == writer
+
+        output.instance_variable_set :@something_writer, output_writer
+
+        proven
+      end
+
+      def created_lazily?(name)
+        define_getter
+
+        output = Macro::Output.new
+
+        output_writer = output.instance_variable_get :"@#{name}"
+        output.instance_variable_set :"@#{name}", nil
+
+        output.send name
+
+        presently = output.instance_variable_get("@#{name}")
+
+        proven = !presently.nil?
+
+        output.instance_variable_set :@something_writer, output_writer
+
+        proven
+      end
     end
   end
 end
 
-heading 'A writer definition is created by the writer macro'
+macro = Output::WriterMacro.new Macro::Output, :something, :debug, ->(text) {text}
 
-output = SomeOutput.instance
-
-proof 'Writer definition is listed by name' do
-  output.prove { writer_defined? :something }
+proof "Attribute's properties are it's name and the backing variable name" do
+  macro.prove { attribute_properties? :something, [:something_writer, :@something_writer] }
 end
 
-proof 'Name is part of the definition' do
-  output.prove { name? :something }
+proof "Defines a getter for the writer" do
+  macro.define_getter
+  macro.prove { getter? :something_writer }
 end
 
-proof 'Level is part of the definition' do
-  output.prove { level? :something, :debug }
+proof "Defines a setter for the writer" do
+  macro.define_setter
+  macro.prove { setter? :something_writer }
 end
 
-proof 'Message transformer is part of the definition' do
-  output.prove { message_transformer? :something, message_transformer }
+proof "Defines the write method for the writer" do
+  macro.define_write_method
+  macro.prove { writes? :something }
+end
+
+proof "Access to writers is provided by their getters" do
+  some_writer = OpenStruct.new
+  macro.prove { gets? :something_writer, some_writer }
+end
+
+proof "Writers are assigned lazily upon access of their getters" do
+  macro.prove { created_lazily? :something_writer }
+end
+
+proof "Assignment of writers is provided by their setters" do
+  some_writer = OpenStruct.new
+  macro.prove { sets? :something_writer, some_writer }
 end
