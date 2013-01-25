@@ -1,11 +1,3 @@
-require 'ostruct'
-
-class WriterDefinition < OpenStruct
-  def flatten
-    return name, level, message_transformer
-  end
-end
-
 module Output
   def self.included(base)
     base.extend ClassMethods
