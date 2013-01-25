@@ -28,7 +28,7 @@ module Output
       level = self.level
       message_transformer = self.message_transformer
 
-      attribute_name, var_name = self.class.attribute_properties(name)
+      attribute_name, var_name = Writer::Naming.attribute_properties(name)
 
       output_class.send :define_method, attribute_name do
         writer = instance_variable_get var_name
@@ -43,7 +43,7 @@ module Output
     end
 
     def define_setter
-      attribute_name, var_name = self.class.attribute_properties(name)
+      attribute_name, var_name = Writer::Naming.attribute_properties(name)
 
       output_class.send :define_method, "#{attribute_name}=" do |writer|
         writer.logger_level = level
@@ -58,12 +58,6 @@ module Output
         writer(name).write message
         message
       end
-    end
-
-    def self.attribute_properties(name)
-      attribute_name = :"#{name}_writer"
-      var_name = :"@#{attribute_name}"
-      return attribute_name, var_name
     end
   end
 end

@@ -72,6 +72,12 @@ module Output
       def camel_case(name)
         name.to_s.split('_').collect { |s| s.capitalize }.join
       end
+
+      def attribute_properties(name)
+        attribute_name = :"#{name}_writer"
+        var_name = :"@#{attribute_name}"
+        return attribute_name, var_name
+      end
     end
   end
 end

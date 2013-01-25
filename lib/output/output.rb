@@ -14,7 +14,19 @@ module Output
   end
 
   def writer(name)
-    send self.class.writer_accessor(name)
+    send self.class.writer_attribute(name)
+  end
+
+  def build_writer(name, level, message_transformer)
+    logger_name = Writer::Naming.fully_qualified(self.class, name)
+    writer = Writer.build name, level, message_transformer, self.level, logger_name
+  end
+
+  def each_writer
+    self.class.writers.each do |name|
+      writer = send self.class.writer_attribute(name)
+      yield writer
+    end
   end
 
   def level
@@ -23,9 +35,7 @@ module Output
 
   def level=(level)
     @level = level
-
     each_writer { |w| w.logger_level = level }
-
     level
   end
 
@@ -51,18 +61,6 @@ module Output
     level
   end
 
-  def build_writer(name, level, message_transformer)
-    logger_name = Writer::Naming.fully_qualified(self.class, name)
-    writer = Writer.build name, level, message_transformer, self.level, logger_name
-  end
-
-  def each_writer
-    self.class.writers.each do |name|
-      writer = send self.class.writer_accessor(name)
-      yield writer
-    end
-  end
-
   module ClassMethods
     def logger_level
       @logger_level ||= Output::DEFAULT_LOGGER_LEVEL
@@ -85,9 +83,8 @@ module Output
     end
     alias :writer :writer_macro
 
-    # TODO this is now coded here, and in WriterMacro
-    def writer_accessor(name)
-      :"#{name}_writer"
+    def writer_attribute(name)
+      Writer::Naming.attribute_properties(name)[0]
     end
   end
 end
