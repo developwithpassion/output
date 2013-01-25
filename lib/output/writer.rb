@@ -13,13 +13,14 @@ module Output
       enable
     end
 
-    def self.build(writer_name, level=Output::DEFAULT_LOGGER_LEVEL, message_transformer=nil, logger_level=Output::DEFAULT_LOGGER_LEVEL)
-      logger = build_logger(writer_name, logger_level)
+    def self.build(writer_name, level=Output::DEFAULT_LOGGER_LEVEL, message_transformer=nil, logger_level=Output::DEFAULT_LOGGER_LEVEL, logger_name=nil)
+      logger_name ||= writer_name
+      logger = build_logger(logger_name, logger_level)
       writer = new(writer_name, level, message_transformer, logger)
     end
 
     def self.build_logger(name, level)
-      logger = Logging.logger[name.to_s]
+      logger = Logging.logger[name]
       logger.level = level
 
       layout = Logging.layouts.pattern(:pattern => '%m\n')
@@ -50,9 +51,27 @@ module Output
       @logger.level = level
     end
 
+    def logger_name
+      @logger.name
+    end
+
     def write(message)
       message = message_transformer.call message
       @logger.send level, message if enabled?
+    end
+
+    module Naming
+      extend self
+
+      def fully_qualified(mod, writer_name)
+        namespace = mod.name
+        writer_name = camel_case(writer_name)
+        "#{namespace}::#{writer_name}"
+      end
+
+      def camel_case(name)
+        name.to_s.split('_').collect { |s| s.capitalize }.join
+      end
     end
   end
 end
