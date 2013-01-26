@@ -7,7 +7,6 @@ heading "Writer's logger level is set to the Output object's level when the writ
 module AssignWriter
   class Output
     include ::Output
-    include Single
 
     level :info
 
@@ -25,7 +24,9 @@ module Output
   end
 end
 
-output = AssignWriter::Output.instance
+def output
+  AssignWriter::Output.new
+end
 
 proof "Writer's logger level is the output's level" do
   output.level = :debug

@@ -17,7 +17,6 @@ heading log_level_docs
 module ChangeWriterLevel
   class Output
     include ::Output
-    include Single
 
     level :info
 
@@ -36,7 +35,7 @@ heading "Writers write when the output object's level is inclusive of the writer
   comment "TODO Proofs can be written once the Proof library output object uses a StringIo appender"
 end
 
-output = ChangeWriterLevel::Output.instance
+output = ChangeWriterLevel::Output.new
 
 proof "Writer doesn't write when it's level is lower than the output's level" do
   output.prove { writes? "\> This doesn't write because the writer is :debug and the logger is :info" }
