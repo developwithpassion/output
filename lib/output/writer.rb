@@ -1,4 +1,5 @@
 module Output
+
   class Writer
     attr_reader :name
     attr_accessor :level
@@ -15,21 +16,10 @@ module Output
 
     def self.build(writer_name, level=Output::DEFAULT_LOGGER_LEVEL, message_transformer=nil, logger_level=Output::DEFAULT_LOGGER_LEVEL, logger_name=nil)
       logger_name ||= writer_name
-      logger = build_logger(logger_name, logger_level)
+      logger = LoggingUtil.build_logger(logger_name, logger_level)
       writer = new(writer_name, level, message_transformer, logger)
     end
 
-    def self.build_logger(name, level)
-      logger = Logging.logger[name]
-      logger.level = level
-
-      layout = Logging.layouts.pattern(:pattern => '%m\n')
-      stdout_appender = Logging::Appenders::Stdout.new('stdout', :layout => layout)
-
-      logger.appenders = stdout_appender
-
-      logger
-    end
 
     def disable
       @enabled = false
@@ -44,8 +34,7 @@ module Output
     end
 
     def logger_level
-      # TODO convert to logger symbol from number
-      Util.log_level @logger.level
+      Output::LoggingUtil.level_name @logger.level
     end
 
     def logger_level=(level)
@@ -78,14 +67,6 @@ module Output
         attribute_name = :"#{name}_writer"
         var_name = :"@#{attribute_name}"
         return attribute_name, var_name
-      end
-    end
-
-    module Util
-      def log_level(number)
-        return case number
-          when 0 ...
-        end
       end
     end
   end
