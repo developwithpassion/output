@@ -24,7 +24,7 @@ module Output
   end
 
   def each_writer
-    self.class.writers.each do |name|
+    self.class.writer_names.each do |name|
       writer = send self.class.writer_attribute(name)
       yield writer
     end
@@ -73,14 +73,14 @@ module Output
     end
     alias :level :logger_level=
 
-    def writers
-      @writers ||= []
+    def writer_names
+      @writer_names ||= []
     end
 
     def writer_macro(name, options = {}, &message_transformer)
       level = options.fetch(:level, name)
       WriterMacro.define_writer self, name, level, message_transformer
-      writers << name
+      writer_names << name
     end
     alias :writer :writer_macro
 

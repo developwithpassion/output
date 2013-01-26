@@ -30,7 +30,7 @@ module Output
     end
 
     def enabled?
-      @enabled
+      enabled
     end
 
     def logger_level

@@ -10,7 +10,7 @@ module Output
         name == level_name
       end
 
-      def changes_level_to?(new_level_name)
+      def change_level_to?(new_level_name)
         logger_level = new_level_name
         logger_level == new_level_name
       end
@@ -38,5 +38,5 @@ end
 proof 'Changing its logger level should update its loggers level accordingly' do
   writer = create_writer
 
-  writer.prove { changes_level_to? :info }
+  writer.prove { change_level_to? :info }
 end
