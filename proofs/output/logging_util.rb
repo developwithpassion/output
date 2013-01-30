@@ -2,7 +2,6 @@ require_relative '../proofs_init'
 
 title 'Logging Util'
 
-
 =begin
 When the Logging framework is initialized, you can pass in an options set of "levels" that will be used as the only
 allowable levels that can be used for the logging session. At that point, any other custom levels that are attempted to
@@ -26,7 +25,7 @@ end
 heading 'Logging Levels'
 
 proof 'Default logging level names should be mapped from the logging layer using the positional initialization of its own levels' do
-  Output::LoggingUtil.level_name(0).prove { self ==  :debug }
+  Output::Writer::Util.level_name(0).prove { self ==  :debug }
   Output::LoggingUtil.level_name(1).prove { self ==  :info }
   Output::LoggingUtil.level_name(2).prove { self ==  :warn }
   Output::LoggingUtil.level_name(3).prove { self ==  :error }
