@@ -2,7 +2,6 @@ require 'logging'
 require 'setter'
 require 'single'
 
-require 'output/logging_util'
 require 'output/writer_macro'
 require 'output/output'
 require 'output/build_logger'
