@@ -1,6 +1,7 @@
 module Output
-
   class Writer
+    include BuildLogger
+
     attr_reader :name
     attr_accessor :level
     attr_reader :message_transformer
@@ -16,10 +17,9 @@ module Output
 
     def self.build(writer_name, level=Output::DEFAULT_LOGGER_LEVEL, message_transformer=nil, logger_level=Output::DEFAULT_LOGGER_LEVEL, logger_name=nil)
       logger_name ||= writer_name
-      logger = LoggingUtil.build_logger(logger_name, logger_level)
+      logger = build_logger(logger_name, logger_level)
       writer = new(writer_name, level, message_transformer, logger)
     end
-
 
     def disable
       @enabled = false
@@ -34,7 +34,7 @@ module Output
     end
 
     def logger_level
-      Output::LoggingUtil.level_name @logger.level
+      Util.level_name @logger.level
     end
 
     def logger_level=(level)
@@ -67,6 +67,16 @@ module Output
         attribute_name = :"#{name}_writer"
         var_name = :"@#{attribute_name}"
         return attribute_name, var_name
+      end
+    end
+
+    module Util
+      extend self
+
+      def level_name(level_number)
+        level_names = Logging::LNAMES
+        level_name =  Logging::levelify level_names[level_number]
+        level_name.to_sym
       end
     end
   end
