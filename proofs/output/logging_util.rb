@@ -26,12 +26,11 @@ heading 'Logging Levels'
 
 proof 'Default logging level names should be mapped from the logging layer using the positional initialization of its own levels' do
   Output::Writer::Util.level_name(0).prove { self ==  :debug }
-  Output::LoggingUtil.level_name(1).prove { self ==  :info }
-  Output::LoggingUtil.level_name(2).prove { self ==  :warn }
-  Output::LoggingUtil.level_name(3).prove { self ==  :error }
-  Output::LoggingUtil.level_name(4).prove { self ==  :fatal }
+  Output::Writer::Util.level_name(1).prove { self ==  :info }
+  Output::Writer::Util.level_name(2).prove { self ==  :warn }
+  Output::Writer::Util.level_name(3).prove { self ==  :error }
+  Output::Writer::Util.level_name(4).prove { self ==  :fatal }
 end
-
 
 heading 'Building Loggers'
 
@@ -39,6 +38,6 @@ proof 'Default logger should be initialized with a stdout logger and a level of 
   name = 'name'
   level = :info
 
-  logger = Output::LoggingUtil.build_logger(name, level)
+  logger = Output::Writer::BuildLogger::ClassMethods::build_logger(name, level)
   logger.prove { correct_name_and_level? name, level } 
 end

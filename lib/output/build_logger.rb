@@ -6,6 +6,7 @@ module Output
       end
 
       module ClassMethods
+        extend self
         def build_logger(name, level)
           logger = Logging.logger[name]
           logger.level = level
