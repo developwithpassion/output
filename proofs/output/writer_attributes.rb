@@ -2,17 +2,29 @@ require_relative '../proofs_init'
 
 title 'Writer Attributes'
 
-def writer_attribute_properties
-  writer_name = :something
-  Output::Writer::Naming.attribute_properties(writer_name)
+def writer_attribute(writer_name)
+  Output::Writer::Attribute.build writer_name
 end
 
-proof 'Format of writer attribute name is: "{name}_writer"' do
-  attribute_name, variable_name = writer_attribute_properties
-  attribute_name.prove { self == :something_writer }
+module Output
+  class Writer
+    class Attribute
+      module Proof
+        def attribute_name?(attribute_name)
+          self.name == attribute_name
+        end
+        def variable_name?(variable_name)
+          self.variable_name == variable_name
+        end
+      end
+    end
+  end
 end
 
-proof 'Format of writer variable name is: "@{name}_writer"' do
-  attribute_name, variable_name = writer_attribute_properties
-  variable_name.prove { self == :@something_writer }
+proof 'Writer attribute name is the name of the writer suffixed with "_writer"' do
+  writer_attribute(:something).prove { attribute_name? :something_writer }
+end
+
+proof 'Writer variable name is the name of the writer prefixed with "@" and suffixed with "_writer"' do
+  writer_attribute(:something).prove { variable_name? :@something_writer }
 end
