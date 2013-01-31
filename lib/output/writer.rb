@@ -1,19 +1,14 @@
 module Output
   class Writer
     include BuildLogger
+    include Initializer
 
     attr_reader :name
     attr_accessor :level
     attr_reader :message_transformer
     attr_reader :enabled
 
-    def initialize(name, level, message_transformer, logger)
-      @name = name
-      @level = level
-      @message_transformer = message_transformer
-      @logger = logger
-      enable
-    end
+    initializer :name, :level, :message_transformer, :logger
 
     def self.build(writer_name, level=Output::DEFAULT_LOGGER_LEVEL, message_transformer=nil, logger_level=Output::DEFAULT_LOGGER_LEVEL, logger_name=nil)
       logger_name ||= writer_name
@@ -30,7 +25,7 @@ module Output
     end
 
     def enabled?
-      enabled
+      @enabled ||= true
     end
 
     def logger_level

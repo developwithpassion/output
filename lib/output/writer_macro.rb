@@ -1,20 +1,17 @@
 module Output
   class WriterMacro
+    include Initializer
+
     attr_reader :output_class
     attr_reader :name
     attr_reader :level
     attr_reader :message_transformer
 
+    initializer :output_class, :name, :level, :message_transformer
+
     def self.define_writer(output_class, name, level, message_transformer)
       macro = new output_class, name, level, message_transformer
       macro.define_writer
-    end
-
-    def initialize(output_class, name, level, message_transformer=nil)
-      @output_class = output_class
-      @name = name
-      @level = level
-      @message_transformer = message_transformer
     end
 
     def define_writer

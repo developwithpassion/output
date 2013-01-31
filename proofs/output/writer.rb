@@ -18,7 +18,7 @@ module Output
   end
 end
 
-def create_writer
+def writer
   Logging::reset
 
   Logging::init(:info,:debug)
@@ -30,13 +30,13 @@ def create_writer
 end
 
 proof 'Its logger level should be the symbolic representation of the level' do
-  writer = create_writer
-
   writer.prove { logger_level_named? :debug }
 end
 
 proof 'Changing its logger level should update its loggers level accordingly' do
-  writer = create_writer
-
   writer.prove { change_level_to? :info }
+end
+
+proof 'Is initially enabled' do
+  writer.prove { enabled? }
 end

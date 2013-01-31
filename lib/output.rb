@@ -1,6 +1,7 @@
 require 'logging'
 require 'setter'
 require 'single'
+require 'initializer'
 
 require 'output/writer_macro'
 require 'output/output'

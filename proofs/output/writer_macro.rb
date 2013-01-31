@@ -13,7 +13,7 @@ module Output
   class WriterMacro
     module Proof
       def attribute_properties?(name, properties)
-        properties == self.class.attribute_properties(name)
+        properties == Writer::Naming.attribute_properties(name)
       end
 
       def getter?(name)
