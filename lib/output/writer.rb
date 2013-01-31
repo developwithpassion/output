@@ -80,11 +80,6 @@ module Output
       def camel_case(name)
         name.to_s.split('_').collect { |s| s.capitalize }.join
       end
-
-      def attribute_properties(name)
-        attribute = ::Output::Writer::Attribute.build name
-        return attribute.name, attribute.variable_name
-      end
     end
 
     module Util
