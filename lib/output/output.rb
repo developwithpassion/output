@@ -85,7 +85,7 @@ module Output
     alias :writer :writer_macro
 
     def writer_attribute(name)
-      Writer::Naming.attribute_properties(name)[0]
+      Writer::Attribute.attribute_name(name)
     end
   end
 end

@@ -45,6 +45,29 @@ module Output
       @logger.send level, message if enabled?
     end
 
+    class Attribute
+      include Initializer
+
+      attr_reader :name
+      attr_reader :variable_name
+
+      initializer :name, :variable_name
+
+      def self.build(name)
+        attribute_name = attribute_name(name)
+        variable_name = variable_name(name)
+        new attribute_name, variable_name
+      end
+
+      def self.attribute_name(name)
+        :"#{name}_writer"
+      end
+
+      def self.variable_name(name)
+        :"@#{name}_writer"
+      end
+    end
+
     module Naming
       extend self
 
@@ -56,12 +79,6 @@ module Output
 
       def camel_case(name)
         name.to_s.split('_').collect { |s| s.capitalize }.join
-      end
-
-      def attribute_properties(name)
-        attribute_name = :"#{name}_writer"
-        var_name = :"@#{attribute_name}"
-        return attribute_name, var_name
       end
     end
 

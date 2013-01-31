@@ -12,10 +12,6 @@ end
 module Output
   class WriterMacro
     module Proof
-      def attribute_properties?(name, properties)
-        properties == Writer::Naming.attribute_properties(name)
-      end
-
       def getter?(name)
         output_class.method_defined? name
       end
@@ -77,10 +73,6 @@ module Output
 end
 
 macro = Output::WriterMacro.new Macro::Output, :something, :debug, ->(text) {text}
-
-proof "Attribute's properties are it's name and the backing variable name" do
-  macro.prove { attribute_properties? :something, [:something_writer, :@something_writer] }
-end
 
 proof "Defines a getter for the writer" do
   macro.define_getter
