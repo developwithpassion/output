@@ -19,10 +19,6 @@ module Output
 end
 
 def writer
-  Logging::reset
-
-  Logging::init(:info,:debug)
-
   logger = Logging::logger['First']
   logger.level = :debug
 

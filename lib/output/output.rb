@@ -56,6 +56,23 @@ module Output
     level
   end
 
+  def push_appender(appender)
+    each_writer do|writer|
+      writer.push_appender appender
+    end
+    if block_given?
+      yield
+      pop_appender
+    end
+  end
+
+  def pop_appender
+    each_writer do|writer|
+      writer.pop_appender
+    end
+  end
+
+
   def pop_level
     level = levels.shift unless levels.empty?
     self.level = level

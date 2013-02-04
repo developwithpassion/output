@@ -7,6 +7,7 @@ module Output
     attr_accessor :level
     attr_reader :message_transformer
     attr_reader :enabled
+    attr_writer :extra_appenders
 
     initializer :name, :level, :message_transformer, :logger
 
@@ -14,6 +15,10 @@ module Output
       logger_name ||= writer_name
       logger = build_logger(logger_name, logger_level)
       writer = new(writer_name, level, message_transformer, logger)
+    end
+
+    def extra_appenders
+      @extra_appenders ||= []
     end
 
     def disable
@@ -43,6 +48,18 @@ module Output
     def write(message)
       message = message_transformer.call message if message_transformer
       @logger.send level, message if enabled?
+    end
+
+    def push_appender(appender)
+      return if extra_appenders.include?(appender)
+      extra_appenders.push appender
+      @logger.add_appenders(appender)
+    end
+
+    def pop_appender
+      return if extra_appenders.count == 0
+      appender = extra_appenders.pop
+      @logger.remove_appenders(appender)
     end
 
     class Attribute
