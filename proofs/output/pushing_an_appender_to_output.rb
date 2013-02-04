@@ -39,6 +39,10 @@ module Output
   end
 end
 
+def new_appender
+  Logging.appenders.string_io(:first)
+end
+
 def new_output
   logger = Logging::logger['First']
   logger.level = :debug
@@ -48,7 +52,7 @@ end
 
 heading 'Pushing an appender' do
   proof 'Pushes it to all of its writers' do
-    appender = Logging.appenders.file('output.log')
+    appender = new_appender
     output = new_output
 
     output.push_appender appender
@@ -57,8 +61,9 @@ heading 'Pushing an appender' do
 end
 
 heading 'Pushing an appender with a block' do
+  appender = new_appender
+
   proof 'Pushes it to all of the writers appenders' do
-    appender = Logging.appenders.file('output.log')
     output = new_output
 
     output.push_appender appender
@@ -66,7 +71,6 @@ heading 'Pushing an appender with a block' do
   end
 
   proof 'Pops the appender from all of its writers after the block has run' do
-    appender = Logging.appenders.file('output.log')
     output = new_output
 
     output.push_appender appender do

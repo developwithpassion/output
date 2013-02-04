@@ -16,6 +16,10 @@ module Output
   end
 end
 
+def new_appender
+  Logging.appenders.string_io(:first)
+end
+
 def new_writer
   logger = Logging::logger['First']
   logger.level = :debug
@@ -23,22 +27,24 @@ def new_writer
   Output::Writer.new 'first',:debug, nil, logger
 end
 
-proof 'Removes it from the list of extra appenders' do
-  appender = Logging.appenders.file('output.log')
-  writer = new_writer
-  writer.push_appender appender
+section do
+  appender = new_appender
 
-  writer.pop_appender
+  proof 'Removes it from the list of extra appenders' do
+    writer = new_writer
+    writer.push_appender appender
 
-  writer.prove { not appender? appender }
-end
+    writer.pop_appender
 
-proof 'Removes it from its loggers list of appenders' do
-  appender = Logging.appenders.file('output.log')
-  writer = new_writer
-  writer.push_appender appender
+    writer.prove { not appender? appender }
+  end
 
-  writer.pop_appender
+  proof 'Removes it from its loggers list of appenders' do
+    writer = new_writer
+    writer.push_appender appender
 
-  writer.prove { not logger_appender? appender }
+    writer.pop_appender
+
+    writer.prove { not logger_appender? appender }
+  end
 end

@@ -26,6 +26,10 @@ module Output
   end
 end
 
+def new_appender
+  Logging.appenders.string_io(:first)
+end
+
 def new_writer
   logger = Logging::logger['First']
   logger.level = :debug
@@ -34,8 +38,8 @@ def new_writer
 end
 
 heading 'Pushing an appender' do
+  appender = new_appender
   proof 'Appender is added to list of extra appenders' do
-    appender = Logging.appenders.file('output.log')
     writer = new_writer
 
     writer.push_appender appender
@@ -43,7 +47,6 @@ heading 'Pushing an appender' do
     writer.prove { appender? appender }
   end
   proof 'Appender is added to its loggers appenders' do
-    appender = Logging.appenders.file('output.log')
     writer = new_writer
 
     writer.push_appender appender
@@ -53,8 +56,9 @@ heading 'Pushing an appender' do
 end
 
 heading 'Pushing an appender that the writer already has' do
+  appender = new_appender
+
   proof 'Appender is not re-added to its list of extra appenders' do
-    appender = Logging.appenders.file('second.log')
     writer = new_writer
 
     writer.push_appender appender
@@ -65,7 +69,6 @@ heading 'Pushing an appender that the writer already has' do
   end
 
   proof 'Appender is not re-added to its loggers appenders' do
-    appender = Logging.appenders.file('second.log')
     writer = new_writer
 
     writer.push_appender appender
