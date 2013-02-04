@@ -27,24 +27,23 @@ def new_writer
   Output::Writer.new 'first',:debug, nil, logger
 end
 
-section do
+
+proof 'Removes it from the list of extra appenders' do
   appender = new_appender
+  writer = new_writer
+  writer.push_appender appender
 
-  proof 'Removes it from the list of extra appenders' do
-    writer = new_writer
-    writer.push_appender appender
+  writer.pop_appender
 
-    writer.pop_appender
+  writer.prove { not appender? appender }
+end
 
-    writer.prove { not appender? appender }
-  end
+proof 'Removes it from its loggers list of appenders' do
+  appender = new_appender
+  writer = new_writer
+  writer.push_appender appender
 
-  proof 'Removes it from its loggers list of appenders' do
-    writer = new_writer
-    writer.push_appender appender
+  writer.pop_appender
 
-    writer.pop_appender
-
-    writer.prove { not logger_appender? appender }
-  end
+  writer.prove { not logger_appender? appender }
 end
