@@ -64,7 +64,7 @@ heading 'Pushing an appender that the writer already has' do
     writer.push_appender appender
     writer.push_appender appender
 
-    writer.prove { appenders? appender, 1 }
+    writer.prove { appenders? appender, count = 1 }
 
   end
 
@@ -74,7 +74,7 @@ heading 'Pushing an appender that the writer already has' do
     writer.push_appender appender
     writer.push_appender appender
 
-    writer.prove { logger_appenders? appender, 1 }
+    writer.prove { logger_appenders? appender, count = 1 }
 
   end
 end

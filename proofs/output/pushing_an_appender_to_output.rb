@@ -76,6 +76,7 @@ heading 'Pushing an appender with a block' do
     output.push_appender appender do
       output.prove { appender? appender }
     end
+
     output.prove { !appender?(appender) }
   end
 end
