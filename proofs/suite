@@ -1,5 +1,3 @@
-#!/usr/bin/env ruby
-
 require_relative 'proofs_init'
 
 files = Dir.glob("proofs/output/**/*.rb").reject do|item| 
