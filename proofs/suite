@@ -2,10 +2,8 @@
 
 require_relative 'proofs_init'
 
-files = Dir.glob("proofs/output/**/*.rb")
-files = files.concat Dir.glob("proofs/demos/**/*.rb")
+files = Dir.glob("proofs/output/**/*.rb").reject do|item| 
+  /_sketch/ =~ item
+end
 
-files.reject!{|item| /_sketch/ =~ item}
-
-
-Proof::Runner::Suite.run files
+Proof::Runner::Suite.run files, "proofs/demos/**/*.rb"
