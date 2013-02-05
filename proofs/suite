@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+
+require_relative 'proofs_init'
+
+Proof::Runner::Suite.run_globs 'proofs/output/**/*.rb', 'proofs/demos/**/*.rb'
