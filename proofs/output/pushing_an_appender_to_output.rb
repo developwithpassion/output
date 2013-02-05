@@ -13,31 +13,13 @@ module PushingAnAppenderToOutputProofs
 
     module Proof
       def appender?(appender)
-        result = true
-        first_writer.prove do 
-          result &&= appender?(appender) 
-          true
-        end
-        second_writer.prove do 
-          result &&= appender?(appender)
-          true
-        end
-        result
+        first_writer.appender?(appender) &&
+        second_writer.appender?(appender)
       end
     end
   end
 end
 
-module Output
-  class Writer
-    module Proof
-      def appender?(appender)
-        extra_appenders.include?(appender) &&
-          @logger.appenders.include?(appender)
-      end
-    end
-  end
-end
 
 def new_appender
   Logging.appenders.string_io(:first)
@@ -67,6 +49,7 @@ heading 'Pushing an appender with a block' do
     output = new_output
 
     output.push_appender appender
+
     output.prove { appender? appender }
   end
 
@@ -74,7 +57,6 @@ heading 'Pushing an appender with a block' do
     output = new_output
 
     output.push_appender appender do
-      output.prove { appender? appender }
     end
 
     output.prove { !appender?(appender) }

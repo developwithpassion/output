@@ -6,7 +6,7 @@ module Output
   class Writer
     module Proof
       def appender?(appender)
-        extra_appenders.include?(appender) &&
+        appenders.include?(appender) &&
           @logger.appenders.include?(appender)
       end
       def logger_appender?(appender)
@@ -28,7 +28,7 @@ def new_writer
 end
 
 
-proof 'Removes it from the list of extra appenders' do
+proof 'Removes it from the list of appenders' do
   appender = new_appender
   writer = new_writer
   writer.push_appender appender
@@ -38,7 +38,7 @@ proof 'Removes it from the list of extra appenders' do
   writer.prove { not appender? appender }
 end
 
-proof 'Removes it from its loggers list of appenders' do
+proof 'Removes it from its logger' do
   appender = new_appender
   writer = new_writer
   writer.push_appender appender

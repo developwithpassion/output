@@ -64,12 +64,14 @@ module Output
       yield
       pop_appender
     end
+    appender
   end
 
   def pop_appender
     each_writer do|writer|
       writer.pop_appender
     end
+    nil
   end
 
 

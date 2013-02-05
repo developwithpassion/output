@@ -7,7 +7,7 @@ module Output
     attr_accessor :level
     attr_reader :message_transformer
     attr_reader :enabled
-    attr_writer :extra_appenders
+    attr_writer :appenders
 
     initializer :name, :level, :message_transformer, :logger
 
@@ -17,8 +17,8 @@ module Output
       writer = new(writer_name, level, message_transformer, logger)
     end
 
-    def extra_appenders
-      @extra_appenders ||= []
+    def appenders
+      @appenders ||= []
     end
 
     def disable
@@ -51,15 +51,19 @@ module Output
     end
 
     def push_appender(appender)
-      return if extra_appenders.include?(appender)
-      extra_appenders.push appender
+      return if appenders.include?(appender)
+      appenders.push appender
       @logger.add_appenders(appender)
     end
 
     def pop_appender
-      return if extra_appenders.count == 0
-      appender = extra_appenders.pop
+      return if appenders.count == 0
+      appender = appenders.pop
       @logger.remove_appenders(appender)
+    end
+
+    def appender?(appender)
+      appenders.include?(appender)
     end
 
     class Attribute

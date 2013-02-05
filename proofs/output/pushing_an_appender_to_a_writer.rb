@@ -6,7 +6,7 @@ module Output
   class Writer
     module Proof
       def appender?(appender)
-        extra_appenders.include?(appender)
+        appenders.include?(appender)
       end
 
       def logger_appender?(appender)
@@ -14,8 +14,8 @@ module Output
       end
 
       def appenders?(appender, occurences)
-        extra_appenders.include?(appender) &&
-          extra_appenders.count == occurences
+        appenders.include?(appender) &&
+          appenders.count == occurences
       end
 
       def logger_appenders?(appender, occurences)
@@ -39,7 +39,8 @@ end
 
 heading 'Pushing an appender' do
   appender = new_appender
-  proof 'Appender is added to list of extra appenders' do
+
+  proof 'Appender is added to list of appenders' do
     writer = new_writer
 
     writer.push_appender appender
@@ -58,7 +59,7 @@ end
 heading 'Pushing an appender that the writer already has' do
   appender = new_appender
 
-  proof 'Appender is not re-added to its list of extra appenders' do
+  proof 'Appender is not re-added to its list of appenders' do
     writer = new_writer
 
     writer.push_appender appender
