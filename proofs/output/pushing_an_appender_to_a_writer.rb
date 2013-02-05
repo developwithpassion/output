@@ -80,3 +80,38 @@ heading 'Pushing an appender that the writer already has' do
   end
 end
 
+heading 'Pushing an appender with a block' do
+  appender = new_appender
+
+  proof 'Appender is added to list of appenders' do
+    writer = new_writer
+
+    writer.push_appender appender do
+      writer.prove { appender? appender }
+    end
+  end
+  proof 'Appender is added to its loggers appenders' do
+    writer = new_writer
+
+    writer.push_appender appender do
+      writer.prove { logger_appender? appender }
+    end
+  end
+
+  proof 'Appender is removed from its list of appenders after running the block' do
+    writer = new_writer
+
+    writer.push_appender appender do
+    end
+    writer.prove { !appender? appender }
+  end
+
+  proof 'Appender is removed from its loggers appenders after running the block' do
+    writer = new_writer
+
+    writer.push_appender appender do
+    end
+    writer.prove { !logger_appender? appender }
+  end
+end
+

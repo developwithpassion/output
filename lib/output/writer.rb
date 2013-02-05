@@ -54,6 +54,11 @@ module Output
       return if appenders.include?(appender)
       appenders.push appender
       @logger.add_appenders(appender)
+      if block_given?
+        yield
+        pop_appender
+      end
+      appender
     end
 
     def pop_appender
