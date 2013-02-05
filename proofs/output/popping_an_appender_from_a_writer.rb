@@ -17,11 +17,11 @@ module Output
 end
 
 def new_appender
-  Logging.appenders.string_io(:first)
+  Logging.appenders.string_io(:something)
 end
 
 def new_writer
-  logger = Logging::logger['First']
+  logger = Logging::logger['Something']
   logger.level = :debug
 
   Output::Writer.new 'first',:debug, nil, logger

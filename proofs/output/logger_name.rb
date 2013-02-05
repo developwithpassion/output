@@ -7,7 +7,6 @@ heading "Loggers are named for their full class name, including namespace, and c
 module LoggerName
   class Output
     include ::Output
-    include Single
 
     writer :something
   end
@@ -23,10 +22,11 @@ module Output
   end
 end
 
-output = LoggerName::Output.instance
-something_writer = output.something_writer
+def something_writer
+  output = LoggerName::Output.new
+  output.something_writer
+end
 
 proof "Logger name is the fully-qualified name of the output class and the writer name" do
-  logger_name = output.something_writer.logger_name
   something_writer.prove { logger_name? 'LoggerName::Output::Something' }
 end

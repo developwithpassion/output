@@ -1,6 +1,8 @@
 require 'ostruct'
 
 module Output
+  DEFAULT_LOGGER_LEVEL = :info
+
   def self.included(base)
     base.extend ClassMethods
   end
@@ -74,7 +76,6 @@ module Output
     nil
   end
 
-
   def pop_level
     level = levels.shift unless levels.empty?
     self.level = level
@@ -97,7 +98,7 @@ module Output
     end
 
     def writer_macro(name, options = {}, &message_transformer)
-      level = options.fetch(:level, name)
+      level = options[:level] || logger_level
       WriterMacro.define_writer self, name, level, message_transformer
       writer_names << name
     end
