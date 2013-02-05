@@ -2,4 +2,10 @@
 
 require_relative 'proofs_init'
 
-Proof::Runner::Suite.run_globs 'proofs/output/**/*.rb', 'proofs/demos/**/*.rb'
+files = Dir.glob("proofs/output/**/*.rb")
+files = files.concat Dir.glob("proofs/demos/**/*.rb")
+
+files.reject!{|item| /_sketch/ =~ item}
+
+
+Proof::Runner::Suite.run files
