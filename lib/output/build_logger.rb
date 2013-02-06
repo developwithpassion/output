@@ -7,17 +7,13 @@ module Output
 
       module ClassMethods
         extend self
-        def build_logger(name, level)
+        def build_logger(name, level, appender_options)
           logger = Logging.logger[name]
           logger.level = level
-
-          layout = Logging.layouts.pattern(:pattern => '%m\n')
-          stdout_appender = Logging::Appenders::Stdout.new('stdout', :layout => layout)
-
-          logger.appenders = stdout_appender
-
+          logger.appenders = Output::Appenders.build_appender(name, appender_options)
           logger
         end
+
       end
     end
   end

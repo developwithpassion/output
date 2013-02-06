@@ -72,33 +72,47 @@ module Output
   end
 end
 
-macro = Output::WriterMacro.new Macro::Output, :something, :debug, ->(text) {text}
+def new_macro
+  macro = Output::WriterMacro.new Macro::Output, :something, :debug, Macro::Output::build_appender_options, ->(text) {text}
+end
 
 proof "Defines a getter for the writer" do
+  macro = new_macro
+
   macro.define_getter
   macro.prove { getter? :something_writer }
 end
 
 proof "Defines a setter for the writer" do
+  macro = new_macro
+
   macro.define_setter
   macro.prove { setter? :something_writer }
 end
 
 proof "Defines the write method for the writer" do
+  macro = new_macro
+
   macro.define_write_method
   macro.prove { writes? :something }
 end
 
 proof "Access to writers is provided by their getters" do
+  macro = new_macro
+
   some_writer = OpenStruct.new
   macro.prove { gets? :something_writer, some_writer }
 end
 
 proof "Writers are assigned lazily upon access of their getters" do
+  macro = new_macro
+
   macro.prove { created_lazily? :something_writer }
 end
 
 proof "Assignment of writers is provided by their setters" do
+  macro = new_macro
+
   some_writer = OpenStruct.new
   macro.prove { sets? :something_writer, some_writer }
 end

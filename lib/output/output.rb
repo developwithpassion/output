@@ -1,7 +1,10 @@
 require 'ostruct'
 
+
 module Output
   DEFAULT_LOGGER_LEVEL = :info
+  DEFAULT_PATTERN = '%m\n'
+  DEFAULT_APPENDER = :stdout
 
   def self.included(base)
     base.extend ClassMethods
@@ -19,9 +22,10 @@ module Output
     send self.class.writer_attribute(name)
   end
 
-  def build_writer(name, level, message_transformer=nil)
+  def build_writer(name, level, appender_options = nil, message_transformer=nil)
+    appender_options ||= self.class.build_appender_options
     logger_name = Writer::Naming.fully_qualified(self.class, name)
-    writer = Writer.build name, level, message_transformer, self.level, logger_name
+    writer = Writer.build name, level, message_transformer, self.level, logger_name, appender_options
     writer
   end
 
@@ -83,9 +87,26 @@ module Output
   end
 
   module ClassMethods
+    def default_pattern
+      @pattern ||= Output::DEFAULT_PATTERN
+    end
+
+    def pattern(format)
+      @pattern = format
+    end
+
+    def default_appender_type
+      @device ||= ::Output::DEFAULT_APPENDER
+    end
+
+    def device(device)
+      @device = device
+    end
+
     def logger_level
       @logger_level ||= Output::DEFAULT_LOGGER_LEVEL
     end
+
 
     def logger_level=(level=nil)
       @logger_level = level unless level.nil?
@@ -97,15 +118,27 @@ module Output
       @writer_names ||= []
     end
 
+    def build_appender_options(options = {})
+      appender_options = {}
+      appender_options[:appender] = options[:appender] || default_appender_type
+      appender_options[:pattern] = options[:pattern] || default_pattern
+      appender_options = appender_options.merge(options)
+      appender_options
+    end
+
     def writer_macro(name, options = {}, &message_transformer)
       level = options[:level] || logger_level
-      WriterMacro.define_writer self, name, level, message_transformer
+      appender_options = build_appender_options(options)
+
+      WriterMacro.define_writer self, name, level, appender_options,  message_transformer
       writer_names << name
     end
+
     alias :writer :writer_macro
 
     def writer_attribute(name)
       Writer::Attribute.attribute_name(name)
     end
+
   end
 end

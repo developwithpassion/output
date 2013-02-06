@@ -23,8 +23,9 @@ end
 def new_writer
   logger = Logging::logger['Something']
   logger.level = :debug
+  appender_options ||= { :appender => :stdout, :pattern => '%m\n' }
 
-  Output::Writer.new 'first',:debug, nil, logger
+  Output::Writer.new 'first',:debug, nil, logger, appender_options
 end
 
 

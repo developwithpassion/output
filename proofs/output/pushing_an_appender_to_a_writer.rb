@@ -22,6 +22,17 @@ module Output
         @logger.appenders.include?(appender) &&
           @logger.appenders.select{|item| item == appender}.count == occurences
       end
+
+    end
+  end
+end
+
+module Logging
+  module Appenders
+    class StringIo
+      def attributes_match?(options)
+        self.layout.pattern = options[:pattern]
+      end
     end
   end
 end
@@ -30,11 +41,12 @@ def new_appender
   Logging.appenders.string_io(:first)
 end
 
-def new_writer
+def new_writer(appender_options = nil)
+  appender_options ||= { :appender => :stdout, :pattern => '%m\n' }
   logger = Logging::logger['First']
   logger.level = :debug
 
-  Output::Writer.new 'first',:debug, nil, logger
+  Output::Writer.new 'first',:debug, nil, logger, appender_options
 end
 
 heading 'Pushing an appender' do
@@ -115,3 +127,49 @@ heading 'Pushing an appender with a block' do
   end
 end
 
+heading 'Pushing an appender using default options' do
+  proof 'Appender is added to list of appenders' do
+    writer = new_writer
+
+    appender = writer.push_appender_from_opts :string_io
+
+    writer.prove { appender? appender }
+  end
+
+  proof 'Appender is added to loggers appenders' do
+    writer = new_writer
+
+    appender = writer.push_appender_from_opts :string_io
+
+    writer.prove { logger_appender? appender }
+  end
+
+  proof 'Appender options are set from writers appender options' do
+    writer = new_writer
+
+    appender = writer.push_appender_from_opts :string_io
+
+    appender.prove { attributes_match? writer.appender_options }
+  end
+
+  proof 'Appender is the specified appender type' do
+    writer = new_writer
+
+    appender = writer.push_appender_from_opts :string_io
+    appender.prove { self.class == Logging::Appenders::StringIo }
+  end
+
+end
+
+heading 'Pushing an appender using specified options' do
+  proof 'Appender options are set from specified options' do
+    writer = new_writer
+    pattern = '%m %m \n'
+
+    new_options = { :pattern => pattern }
+
+    appender = writer.push_appender_from_opts :string_io, new_options
+
+    appender.prove { attributes_match? new_options }
+  end
+end

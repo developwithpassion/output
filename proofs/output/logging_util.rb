@@ -14,9 +14,14 @@ so it does not make assumptions about its state.
 module Logging
   class Logger
     module Proof
-      def correct_name_and_level?(name,level)
-        level == level
-        name == name
+      def name?(name)
+        self.name == name
+      end
+      def level?(level_name)
+        Output::Writer::Util.level_name(self.level) == level_name
+      end
+      def appender?
+        appenders.count > 0
       end
     end
   end
@@ -32,12 +37,28 @@ proof 'Default logging level names should be mapped from the logging layer using
   Output::Writer::Util.level_name(4).prove { self ==  :fatal }
 end
 
-heading 'Building Loggers'
-
-proof 'Default logger should be initialized with a stdout logger and a level of debug' do
-  name = 'name'
+heading 'Building Loggers' do
+  name = 'the_name'
   level = :info
+  appender_options = { :appender => :stdout, :pattern => '%m\n' }
 
-  logger = Output::Writer::BuildLogger::ClassMethods::build_logger(name, level)
-  logger.prove { correct_name_and_level? name, level } 
+  build = Proc.new do
+    result = Output::Writer::BuildLogger::ClassMethods::build_logger(name, level, appender_options)
+    result
+  end
+
+  proof 'Name is set' do
+    logger = build.call
+    logger.prove { name? name } 
+  end
+
+  proof 'Level is set' do
+    logger = build.call
+    logger.prove { level? level } 
+  end
+
+  proof 'Initial appender is added' do
+    logger = build.call
+    logger.prove { appender? } 
+  end
 end

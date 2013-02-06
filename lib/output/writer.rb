@@ -9,12 +9,12 @@ module Output
     attr_reader :enabled
     attr_writer :appenders
 
-    initializer :name, :level, :message_transformer, :logger
+    initializer :name, :level, :message_transformer, :logger, :appender_options
 
-    def self.build(writer_name, level=Output::DEFAULT_LOGGER_LEVEL, message_transformer=nil, logger_level=Output::DEFAULT_LOGGER_LEVEL, logger_name=nil)
+    def self.build(writer_name, level=Output::DEFAULT_LOGGER_LEVEL, message_transformer=nil, logger_level=Output::DEFAULT_LOGGER_LEVEL, logger_name=nil, appender_options)
       logger_name ||= writer_name
-      logger = build_logger(logger_name, logger_level)
-      writer = new(writer_name, level, message_transformer, logger)
+      logger = build_logger(logger_name, logger_level, appender_options)
+      writer = new(writer_name, level, message_transformer, logger, appender_options)
     end
 
     def appenders
@@ -50,7 +50,7 @@ module Output
       @logger.send level, message if enabled?
     end
 
-    def push_appender(appender)
+    def push_appender_obj(appender)
       return if appenders.include?(appender)
       appenders.push appender
       @logger.add_appenders(appender)
@@ -59,6 +59,15 @@ module Output
         pop_appender
       end
       appender
+    end
+    alias :push_appender :push_appender_obj
+
+    def push_appender_from_opts(appender_type, options = {}, &block)
+      options = options.merge(:appender => appender_type)
+      options = self.appender_options.merge(options)
+
+      appender = Output::Appenders.build_appender(:anon, options)
+      push_appender_obj appender, &block
     end
 
     def pop_appender

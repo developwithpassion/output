@@ -1,0 +1,6 @@
+Hello File
+Hello again File
+This should go to both appenders
+Hello File
+Hello again File
+This should go to both appenders
