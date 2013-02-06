@@ -18,12 +18,12 @@ module Output
   end
 end
 
-def writer(appender_options = {})
+def writer(device_options = {})
   logger = Logging::logger['First']
   logger.level = :debug
-  appender_options ||= { :appender => :stdout, :pattern => '%m\n' }
+  device_options ||= { :device => :stdout, :pattern => '%m\n' }
 
-  Output::Writer.new 'first',:debug, nil, logger, appender_options
+  Output::Writer.new 'first',:debug, nil, logger, device_options
 end
 
 proof 'Its logger level should be the symbolic representation of the level' do

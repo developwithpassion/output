@@ -1,10 +1,10 @@
 require_relative '../proofs_init'
 
-title "Defining Appender Builder"
+title "Defining Device Builder"
 
-module DefiningAnAppenderBuilderProofs
+module DefiningAnDeviceBuilderProofs
   class Example
-    include Output::Appenders::Builder
+    include Output::Devices::Builder
 
     required_options :pattern, :filename
 
@@ -15,22 +15,22 @@ module DefiningAnAppenderBuilderProofs
         end
       end
 
-      def appender_id?(id)
-        appender_id == id
+      def device_id?(id)
+        device_id == id
       end
     end
   end
 end
 
 def example
-  DefiningAnAppenderBuilderProofs::Example
+  DefiningAnDeviceBuilderProofs::Example
 end
 
 proof 'Stores list of required options' do
   example.prove { required? :pattern, :filename } 
 end
 
-proof 'Stores logging appender class' do
-  example.prove { appender_id? :stdout }
+proof 'Stores logging device class' do
+  example.prove { device_id? :stdout }
 end
 

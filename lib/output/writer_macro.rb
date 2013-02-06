@@ -2,10 +2,10 @@ module Output
   class WriterMacro
     include Initializer
 
-    initializer :output_class, :name, :level, :appender_options, :message_transformer
+    initializer :output_class, :name, :level, :device_options, :message_transformer
 
-    def self.define_writer(output_class, name, level, appender_options, message_transformer)
-      macro = new output_class, name, level, appender_options, message_transformer
+    def self.define_writer(output_class, name, level, device_options, message_transformer)
+      macro = new output_class, name, level, device_options, message_transformer
       macro.define_writer
     end
 
@@ -19,7 +19,7 @@ module Output
       name = self.name
       level = self.level
       transformer = self.message_transformer
-      appender_options = self.appender_options
+      device_options = self.device_options
 
       writer_attribute = Writer::Attribute.build name
       attribute_name = writer_attribute.name
@@ -29,7 +29,7 @@ module Output
         writer = instance_variable_get var_name
 
         unless writer
-          writer = build_writer(name, level, appender_options, transformer) unless writer
+          writer = build_writer(name, level, device_options, transformer) unless writer
           instance_variable_set var_name, writer
         end
 

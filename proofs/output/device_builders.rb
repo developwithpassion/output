@@ -1,19 +1,19 @@
 require_relative '../proofs_init'
 
-title "Appender Builders"
+title "Device Builders"
 
-module AppenderBuildersProofs
+module DeviceBuildersProofs
   class Example
-    include Output::Appenders::Builder
+    include Output::Devices::Builder
 
-    appender :stdout
+    device :stdout
     required_options :pattern, :filename
 
   end
 end
 
 def example
-  AppenderBuildersProofs::Example
+  DeviceBuildersProofs::Example
 end
 
 proof "Fails if all required options are not provided" do

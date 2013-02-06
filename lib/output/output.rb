@@ -4,7 +4,7 @@ require 'ostruct'
 module Output
   DEFAULT_LOGGER_LEVEL = :info
   DEFAULT_PATTERN = '%m\n'
-  DEFAULT_APPENDER = :stdout
+  DEFAULT_DEVICE = :stdout
 
   def self.included(base)
     base.extend ClassMethods
@@ -22,10 +22,10 @@ module Output
     send self.class.writer_attribute(name)
   end
 
-  def build_writer(name, level, appender_options = nil, message_transformer=nil)
-    appender_options ||= self.class.build_appender_options
+  def build_writer(name, level, device_options = nil, message_transformer=nil)
+    device_options ||= self.class.build_device_options
     logger_name = Writer::Naming.fully_qualified(self.class, name)
-    writer = Writer.build name, level, message_transformer, self.level, logger_name, appender_options
+    writer = Writer.build name, level, message_transformer, self.level, logger_name, device_options
     writer
   end
 
@@ -62,20 +62,28 @@ module Output
     level
   end
 
-  def push_appender(appender)
+  def push_device_from_opts(device_type, options = {}, &block)
+    options = options.merge(:device => device_type)
+    options = self.class.build_device_options.merge(options)
+
+    device = Output::Devices.build_device(:anon, options)
+    push_device device, &block
+  end
+
+  def push_device(device, &block)
     each_writer do|writer|
-      writer.push_appender appender
+      writer.push_device device
     end
     if block_given?
       yield
-      pop_appender
+      pop_device
     end
-    appender
+    device
   end
 
-  def pop_appender
+  def pop_device
     each_writer do|writer|
-      writer.pop_appender
+      writer.pop_device
     end
     nil
   end
@@ -95,8 +103,8 @@ module Output
       @pattern = format
     end
 
-    def default_appender_type
-      @device ||= ::Output::DEFAULT_APPENDER
+    def default_device_type
+      @device ||= ::Output::DEFAULT_DEVICE
     end
 
     def device(device)
@@ -118,19 +126,19 @@ module Output
       @writer_names ||= []
     end
 
-    def build_appender_options(options = {})
-      appender_options = {}
-      appender_options[:appender] = options[:appender] || default_appender_type
-      appender_options[:pattern] = options[:pattern] || default_pattern
-      appender_options = appender_options.merge(options)
-      appender_options
+    def build_device_options(options = {})
+      device_options = {}
+      device_options[:device] = options[:device] || default_device_type
+      device_options[:pattern] = options[:pattern] || default_pattern
+      device_options = device_options.merge(options)
+      device_options
     end
 
     def writer_macro(name, options = {}, &message_transformer)
       level = options[:level] || logger_level
-      appender_options = build_appender_options(options)
+      device_options = build_device_options(options)
 
-      WriterMacro.define_writer self, name, level, appender_options,  message_transformer
+      WriterMacro.define_writer self, name, level, device_options,  message_transformer
       writer_names << name
     end
 

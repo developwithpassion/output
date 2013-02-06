@@ -1,6 +1,6 @@
 require_relative '../proofs_init'
 
-title 'Appender Options Errors'
+title 'Device Options Errors'
 
 class Hash
   module Proof
@@ -16,7 +16,7 @@ class Hash
 end
 
 def options(options = {})
-  options.extend Output::Appenders::OptionValidation
+  options.extend Output::Devices::OptionValidation
 end
 
 proof 'Fails if options are not valid' do

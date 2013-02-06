@@ -7,10 +7,10 @@ module Output
 
       module ClassMethods
         extend self
-        def build_logger(name, level, appender_options)
+        def build_logger(name, level, device_options)
           logger = Logging.logger[name]
           logger.level = level
-          logger.appenders = Output::Appenders.build_appender(name, appender_options)
+          logger.appenders = Output::Devices.build_device(name, device_options)
           logger
         end
 

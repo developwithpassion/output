@@ -20,7 +20,7 @@ module Logging
       def level?(level_name)
         Output::Writer::Util.level_name(self.level) == level_name
       end
-      def appender?
+      def device?
         appenders.count > 0
       end
     end
@@ -40,10 +40,10 @@ end
 heading 'Building Loggers' do
   name = 'the_name'
   level = :info
-  appender_options = { :appender => :stdout, :pattern => '%m\n' }
+  device_options = { :device => :stdout, :pattern => '%m\n' }
 
   build = Proc.new do
-    result = Output::Writer::BuildLogger::ClassMethods::build_logger(name, level, appender_options)
+    result = Output::Writer::BuildLogger::ClassMethods::build_logger(name, level, device_options)
     result
   end
 
@@ -57,8 +57,8 @@ heading 'Building Loggers' do
     logger.prove { level? level } 
   end
 
-  proof 'Initial appender is added' do
+  proof 'Initial device is added' do
     logger = build.call
-    logger.prove { appender? } 
+    logger.prove { device? } 
   end
 end

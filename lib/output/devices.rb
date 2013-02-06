@@ -1,13 +1,13 @@
 module Output
-  module Appenders
-    def self.build_appender(name, appender_options)
+  module Devices
+    def self.build_device(name, device_options)
       builders = { 
         :stdout => Builder::Stdout,
         :string_io => Builder::StringIo,
         :file => Builder::File,
       }
-      builder = builders[appender_options[:appender]]
-      builder.build(name, appender_options)
+      builder = builders[device_options[:device]]
+      builder.build(name, device_options)
     end
 
     module Builder
@@ -21,7 +21,7 @@ module Output
         layout = self.layout(pattern)
         options = { :layout => layout }.merge(options)
 
-        Logging.appenders.send self.class.appender_id, name, options
+        Logging.appenders.send self.class.device_id, name, options
       end
 
       def self.included(base)
@@ -38,18 +38,18 @@ module Output
         end
         alias :required_options :required_options=
 
-        def appender_id=(appender_id)
-          @appender_id = appender_id
+        def device_id=(device_id)
+          @device_id = device_id
         end
-        alias :appender :appender_id=
+        alias :device :device_id=
 
-        def appender_id
-          @appender_id ||= Output::DEFAULT_APPENDER
+        def device_id
+          @device_id ||= Output::DEFAULT_DEVICE
         end
 
         def build(name, options)
-          options.extend Output::Appenders::OptionValidation
-          options.validate!(appender_id, all_required_options)
+          options.extend Output::Devices::OptionValidation
+          options.validate!(device_id, all_required_options)
 
           instance = new 
           instance.build(name, options)
@@ -59,29 +59,29 @@ module Output
       class StringIo
         include Builder
 
-        appender :string_io
+        device :string_io
         required_options :pattern
       end
 
       class File
         include Builder
 
-        appender :rolling_file
+        device :rolling_file
         required_options :filename, :pattern
       end
 
       class Stdout
         include Builder
 
-        appender :stdout
+        device :stdout
         required_options :pattern
       end
     end
 
     module OptionValidation
-      def validate!(appender_id, required = [])
+      def validate!(device_id, required = [])
         missing_option = false
-        message = "An #{appender_id} appender requires :\n"
+        message = "An #{device_id} device requires :\n"
         required.each do |key|
           unless self.has_key?(key)
             missing_option = true

@@ -7,18 +7,18 @@ module Output
     attr_accessor :level
     attr_reader :message_transformer
     attr_reader :enabled
-    attr_writer :appenders
+    attr_writer :devices
 
-    initializer :name, :level, :message_transformer, :logger, :appender_options
+    initializer :name, :level, :message_transformer, :logger, :device_options
 
-    def self.build(writer_name, level=Output::DEFAULT_LOGGER_LEVEL, message_transformer=nil, logger_level=Output::DEFAULT_LOGGER_LEVEL, logger_name=nil, appender_options)
+    def self.build(writer_name, level=Output::DEFAULT_LOGGER_LEVEL, message_transformer=nil, logger_level=Output::DEFAULT_LOGGER_LEVEL, logger_name=nil, device_options)
       logger_name ||= writer_name
-      logger = build_logger(logger_name, logger_level, appender_options)
-      writer = new(writer_name, level, message_transformer, logger, appender_options)
+      logger = build_logger(logger_name, logger_level, device_options)
+      writer = new(writer_name, level, message_transformer, logger, device_options)
     end
 
-    def appenders
-      @appenders ||= []
+    def devices
+      @devices ||= []
     end
 
     def disable
@@ -50,34 +50,34 @@ module Output
       @logger.send level, message if enabled?
     end
 
-    def push_appender_obj(appender)
-      return if appenders.include?(appender)
-      appenders.push appender
-      @logger.add_appenders(appender)
+    def push_device_obj(device)
+      return if devices.include?(device)
+      devices.push device
+      @logger.add_appenders(device)
       if block_given?
         yield
-        pop_appender
+        pop_device
       end
-      appender
+      device
     end
-    alias :push_appender :push_appender_obj
+    alias :push_device :push_device_obj
 
-    def push_appender_from_opts(appender_type, options = {}, &block)
-      options = options.merge(:appender => appender_type)
-      options = self.appender_options.merge(options)
+    def push_device_from_opts(device_type, options = {}, &block)
+      options = options.merge(:device => device_type)
+      options = self.device_options.merge(options)
 
-      appender = Output::Appenders.build_appender(:anon, options)
-      push_appender_obj appender, &block
-    end
-
-    def pop_appender
-      return if appenders.count == 0
-      appender = appenders.pop
-      @logger.remove_appenders(appender)
+      device = Output::Devices.build_device(:anon, options)
+      push_device_obj device, &block
     end
 
-    def appender?(appender)
-      appenders.include?(appender)
+    def pop_device
+      return if devices.count == 0
+      device = devices.pop
+      @logger.remove_appenders(device)
+    end
+
+    def device?(device)
+      devices.include?(device)
     end
 
     class Attribute
