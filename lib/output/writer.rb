@@ -82,10 +82,9 @@ module Output
       device
     end
 
-    def push_device(device, options = nil,  &block)
+    def push_device(device, options = {},  &block)
       return push_device__obj(device, &block) if device.is_a? Logging::Appender
 
-      options ||= {}
       push_device__from_opts device, options, &block
     end
 

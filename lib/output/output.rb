@@ -77,7 +77,7 @@ module Output
   def push_device(device, options = {}, &block)
     return push_device__obj(device, &block) if device.is_a? Logging::Appender
 
-    push_device__from_opts device, options, &block
+    push_device__from_opts(device, options, &block)
   end
 
   def push_device__from_opts(device_type, options = {}, &block)
@@ -85,7 +85,7 @@ module Output
     options = self.class.build_device_options.merge(options)
 
     device = Output::Devices.build_device(:anon, options)
-    push_device device, &block
+    push_device__obj device, &block
   end
 
   def push_device__obj(device, &block)
