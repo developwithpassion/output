@@ -74,6 +74,13 @@ module Output
     level
   end
 
+  def pop_level
+    level = levels.shift unless levels.empty?
+    self.level = level
+    level
+  end
+
+
   def push_device(device, options = {}, &block)
     return push_device__obj(device, &block) if device.is_a? Logging::Appender
 
@@ -104,12 +111,6 @@ module Output
       writer.pop_device
     end
     nil
-  end
-
-  def pop_level
-    level = levels.shift unless levels.empty?
-    self.level = level
-    level
   end
 
   module ClassMethods
