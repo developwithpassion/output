@@ -32,15 +32,6 @@ end
 
 heading 'Adding a device' do
 
-  proof 'Adds the device to its devices' do
-    wrt = writer
-    new_device =  device :some_name
-
-    wrt.add_device new_device
-
-    wrt.prove { device? new_device }
-  end
-
   proof 'Adds the device to its loggers appenders' do
     wrt = writer
     new_device =  device :some_name
@@ -48,21 +39,5 @@ heading 'Adding a device' do
     wrt.add_device new_device
 
     wrt.prove { logger_device? new_device }
-  end
-
-  proof 'Cannot add the same device multiple times' do
-    wrt = writer
-    new_device =  device :some_name
-    failed = false
-
-    wrt.add_device new_device
-    begin
-      wrt.add_device new_device
-    rescue
-      failed = true
-    end
-
-    failed.prove { self == true }
-
   end
 end

@@ -23,13 +23,10 @@ end
 
 
 def device
-  Logging.appenders.string_io(:first)
+  Output::Devices.build_device(:some_name, :device => :stdout, :pattern => '%m\n') 
 end
 
 def output
-  logger = Logging::logger['First']
-  logger.level = :debug
-
   PushingADeviceToOutputProofs::Example.new
 end
 

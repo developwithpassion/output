@@ -88,6 +88,30 @@ module Output
     level
   end
 
+  def suspend_device(device, &block)
+    return suspend_device__obj(device, &block) if device.is_a? Logging::Appender
+
+    suspend_device__name device, &block
+  end
+
+  def suspend_device__name(name, &block)
+    device = nil
+    each_writer do |writer|
+      device ||= writer.find_device name
+    end
+    suspend_device__obj device, &block unless device == nil
+  end
+
+  def suspend_device__obj(device, &block)
+    each_writer do |writer|
+      writer.suspend_device device
+    end
+    yield
+    each_writer do |writer|
+      writer.push_device device
+    end
+    device
+  end
 
   def push_device(device, options = {}, &block)
     return push_device__obj(device, &block) if device.is_a? Logging::Appender

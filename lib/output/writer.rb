@@ -60,22 +60,17 @@ module Output
     end
 
     def add_device(device)
-      raise "The device #{device.name} has already been added" if devices.include?(device)
-      devices.push device
       @logger.add_appenders device
       device
     end
 
     def find_device(name)
-      devices.first { |device| device.name == name.to_s }
-    end
-
-    def find_device(name)
-      devices.first { |device| device.name == name.to_s }
+      devices.select do |device|
+        device.name == name.to_s
+      end.first
     end
 
     def remove_device(device)
-      devices.delete device
       @logger.remove_appenders device
       device
     end
@@ -97,13 +92,19 @@ module Output
 
     def suspend_device__obj(device, &block)
       remove_device device
-      yield
-      add_device device
+      devices.delete device
+
+      if block_given?
+        yield
+        push_device__obj device
+      end
       device
     end
 
-    def push_device__obj(device)
-      return if devices.include?(device)
+    def push_device__obj(device, &block)
+      raise "The device #{device.name} has already been pushed" if devices.include?(device)
+
+      devices.push device
 
       add_device device
 
@@ -117,7 +118,7 @@ module Output
     def push_device(device, options = {},  &block)
       return push_device__obj(device, &block) if device.is_a? Logging::Appender
 
-      push_device__opts device, options, &block
+      push_device__opts(device, options, &block)
     end
 
     def push_device__opts(device_type, options = {}, &block)

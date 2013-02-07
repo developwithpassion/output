@@ -68,29 +68,6 @@ heading 'Pushing an device' do
   end
 end
 
-heading 'Pushing an device that the writer already has' do
-  dvc = device
-
-  proof 'Device is not re-added to its list of devices' do
-    wrt = writer
-
-    wrt.push_device dvc
-    wrt.push_device dvc
-
-    wrt.prove { devices? dvc, count = 1 }
-
-  end
-
-  proof 'Device is not re-added to its loggers devices' do
-    wrt = writer
-
-    wrt.push_device dvc
-    wrt.push_device dvc
-
-    wrt.prove { logger_devices? dvc, count = 1 }
-
-  end
-end
 
 heading 'Pushing an device with a block' do
   dvc = device

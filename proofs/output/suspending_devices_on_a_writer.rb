@@ -75,7 +75,7 @@ heading 'By name' do
   proof 'Removes the device from its devices' do
     wrt = writer
     new_device =  device :some_name
-    wrt.add_device new_device
+    wrt.push_device new_device
 
     wrt.suspend_device :some_name do
       wrt.prove { not device? new_device }
@@ -85,7 +85,7 @@ heading 'By name' do
   proof 'Remove the device from its loggers appenders' do
     wrt = writer
     new_device =  device :some_name
-    wrt.add_device new_device
+    wrt.push_device new_device
 
     wrt.suspend_device :some_name do
       wrt.prove { not logger_device? new_device }
@@ -96,7 +96,7 @@ heading 'By name' do
   proof 'Adds the device back onto the devices list after the block has run' do
     wrt = writer
     new_device =  device :some_name
-    wrt.add_device new_device
+    wrt.push_device new_device
     ran = false
 
     wrt.suspend_device :some_name do

@@ -5,10 +5,6 @@ title 'Remove A Device From A Writer'
 module Output
   class Writer
     module Proof
-      def device?(device)
-        devices.include?(device)
-      end
-
       def logger_device?(device)
         @logger.appenders.include?(device)
       end
@@ -30,16 +26,6 @@ def writer
   Output::Writer.new 'first',:debug, nil, logger, device_options
 end
 
-
-proof 'Removes the device from its devices' do
-  wrt = writer
-  new_device =  device :some_name
-  wrt.add_device new_device
-
-  wrt.remove_device new_device
-
-  wrt.prove { not device? new_device }
-end
 
 proof 'Remove the device from its loggers appenders' do
   wrt = writer
