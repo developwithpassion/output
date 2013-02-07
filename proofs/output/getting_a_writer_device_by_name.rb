@@ -19,7 +19,7 @@ proof 'Gets the named device' do
   name = "the_device"
 
   device = wrt.push_device(:string_io)
-  found = wrt.find_device(:string_io)
+  found = wrt.device(:string_io)
   
   found.prove { self == device }
 end
@@ -28,7 +28,7 @@ proof 'Return nil if the named device is not found' do
   wrt = writer
   name = "the_device"
 
-  found = wrt.find_device(:string_io)
+  found = wrt.device(:string_io)
   
   found.prove { nil? }
 end

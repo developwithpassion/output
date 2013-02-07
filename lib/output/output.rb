@@ -97,7 +97,7 @@ module Output
   def suspend_device__name(name, &block)
     device = nil
     each_writer do |writer|
-      device ||= writer.find_device name
+      device ||= writer.device name
     end
     suspend_device__obj device, &block unless device == nil
   end

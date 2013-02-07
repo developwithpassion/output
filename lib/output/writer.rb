@@ -64,7 +64,7 @@ module Output
       device
     end
 
-    def find_device(name)
+    def device(name)
       devices.select do |device|
         device.name == name.to_s
       end.first
@@ -86,8 +86,8 @@ module Output
     end
 
     def suspend_device__name(name, &block)
-      device = find_device name
-      suspend_device__obj device, &block
+      dvc = device name
+      suspend_device__obj dvc, &block
     end
 
     def suspend_device__obj(device, &block)
@@ -124,7 +124,7 @@ module Output
     def push_device__opts(device_type, options = {}, &block)
       options = options.merge(:device => device_type)
       name = options[:name] || device_type 
-      raise "The device #{name} has already been pushed" unless find_device(name).nil?
+      raise "The device #{name} has already been pushed" unless device(name).nil?
 
       options = self.device_options.merge(options)
 
