@@ -31,14 +31,14 @@ end
 otp = output
 
 # Write to the different writers
-output.string_io 'Hello String IO'
-output.stdout 'Hello Std Out'
-output.file 'Hello File'
-output.file 'Hello again File'
+otp.string_io 'Hello String IO'
+otp.stdout 'Hello Std Out'
+otp.file 'Hello File'
+otp.file 'Hello again File'
 
 # Temporarily push a new string_io device to a writer
-device = output.file_writer.push_device_from_opts(:string_io) do
-  output.file 'This should go to both devices'
+device = otp.file_writer.push_device_from_opts(:string_io) do
+  otp.file 'This should go to both devices'
 end
 puts device.read
 
