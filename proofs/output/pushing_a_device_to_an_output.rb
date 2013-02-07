@@ -69,7 +69,7 @@ heading 'Pushing a device using options' do
   proof 'Pushes the device to all of its writers' do
     opt = output
 
-    dvc = opt.push_device_from_opts(:string_io)
+    dvc = opt.push_device(:string_io)
 
     opt.prove { device? dvc }
   end
@@ -78,7 +78,7 @@ heading 'Pushing a device using options' do
     opt = output
     ran = false
 
-    dvc = opt.push_device_from_opts(:string_io) do
+    dvc = opt.push_device(:string_io) do
       ran = true
     end
 
@@ -87,7 +87,7 @@ heading 'Pushing a device using options' do
   proof 'Pops the device from all of its writers after block is run' do
     opt = output
 
-    dvc = opt.push_device_from_opts(:string_io) do
+    dvc = opt.push_device(:string_io) do
     end
 
     opt.prove { not device? dvc }

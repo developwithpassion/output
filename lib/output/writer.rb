@@ -70,7 +70,7 @@ module Output
       device
     end
 
-    def push_device_obj(device)
+    def push_device__obj(device)
       return if devices.include?(device)
 
       add_device device
@@ -81,14 +81,20 @@ module Output
       end
       device
     end
-    alias :push_device :push_device_obj
 
-    def push_device_from_opts(device_type, options = {}, &block)
+    def push_device(device, options = nil,  &block)
+      return push_device__obj(device, &block) if device.is_a? Logging::Appender
+
+      options ||= {}
+      push_device__from_opts device, options, &block
+    end
+
+    def push_device__from_opts(device_type, options = {}, &block)
       options = options.merge(:device => device_type)
       options = self.device_options.merge(options)
 
       device = Output::Devices.build_device(:anon, options)
-      push_device_obj device, &block
+      push_device__obj device, &block
     end
 
     def pop_device

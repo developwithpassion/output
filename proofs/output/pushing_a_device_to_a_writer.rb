@@ -132,7 +132,7 @@ heading 'Pushing an device using default options' do
   proof 'Device is added to list of devices' do
     wrt = writer
 
-    dvc = wrt.push_device_from_opts :string_io
+    dvc = wrt.push_device :string_io
 
     wrt.prove { device? dvc }
   end
@@ -140,7 +140,7 @@ heading 'Pushing an device using default options' do
   proof 'Device is added to loggers devices' do
     wrt = writer
 
-    dvc = wrt.push_device_from_opts :string_io
+    dvc = wrt.push_device :string_io
 
     wrt.prove { logger_device? dvc }
   end
@@ -148,7 +148,7 @@ heading 'Pushing an device using default options' do
   proof 'Device options are set from writers device options' do
     wrt = writer
 
-    dvc = wrt.push_device_from_opts :string_io
+    dvc = wrt.push_device :string_io
 
     dvc.prove { attributes_match? wrt.device_options }
   end
@@ -156,7 +156,7 @@ heading 'Pushing an device using default options' do
   proof 'Device is the specified device type' do
     wrt = writer
 
-    dvc = wrt.push_device_from_opts :string_io
+    dvc = wrt.push_device :string_io
     dvc.prove { self.class == Logging::Appenders::StringIo }
   end
 
@@ -169,7 +169,7 @@ heading 'Pushing an device using specified options' do
 
     new_options = { :pattern => pattern }
 
-    dvc = wrt.push_device_from_opts :string_io, new_options
+    dvc = wrt.push_device :string_io, new_options
 
     dvc.prove { attributes_match? new_options }
   end

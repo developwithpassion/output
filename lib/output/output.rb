@@ -74,7 +74,13 @@ module Output
     level
   end
 
-  def push_device_from_opts(device_type, options = {}, &block)
+  def push_device(device, options = {}, &block)
+    return push_device__obj(device, &block) if device.is_a? Logging::Appender
+
+    push_device__from_opts device, options, &block
+  end
+
+  def push_device__from_opts(device_type, options = {}, &block)
     options = options.merge(:device => device_type)
     options = self.class.build_device_options.merge(options)
 
@@ -82,7 +88,7 @@ module Output
     push_device device, &block
   end
 
-  def push_device(device, &block)
+  def push_device__obj(device, &block)
     each_writer do|writer|
       writer.push_device device
     end
