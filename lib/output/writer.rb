@@ -50,10 +50,23 @@ module Output
       @logger.send level, message if enabled?
     end
 
+    def add_device(device)
+      devices.push device
+      @logger.add_appenders device
+      device
+    end
+
+    def remove_device(device)
+      devices.delete device
+      @logger.remove_appenders device
+      device
+    end
+
     def push_device_obj(device)
       return if devices.include?(device)
-      devices.push device
-      @logger.add_appenders(device)
+
+      add_device device
+
       if block_given?
         yield
         pop_device
@@ -73,7 +86,7 @@ module Output
     def pop_device
       return if devices.count == 0
       device = devices.pop
-      @logger.remove_appenders(device)
+      remove_device device
     end
 
     def device?(device)
