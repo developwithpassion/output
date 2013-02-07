@@ -12,6 +12,14 @@ module Output
 
   def disable
     each_writer { |w| w.disable }
+    if block_given?
+      yield
+      enable
+    end
+  end
+
+  def enable
+    each_writer { |w| w.enable }
   end
 
   def write(method, message)
@@ -84,14 +92,15 @@ module Output
   def push_device(device, options = {}, &block)
     return push_device__obj(device, &block) if device.is_a? Logging::Appender
 
-    push_device__from_opts(device, options, &block)
+    push_device__opts(device, options, &block)
   end
 
-  def push_device__from_opts(device_type, options = {}, &block)
+  def push_device__opts(device_type, options = {}, &block)
     options = options.merge(:device => device_type)
+    name = options[:name] || device_type 
     options = self.class.build_device_options.merge(options)
 
-    device = Output::Devices.build_device(:anon, options)
+    device = Output::Devices.build_device(name, options)
     push_device__obj device, &block
   end
 

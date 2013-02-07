@@ -41,7 +41,7 @@ proof 'Removes the device from its devices' do
   wrt.prove { not device? new_device }
 end
 
-proof 'Remove the device to its loggers appenders' do
+proof 'Remove the device from its loggers appenders' do
   wrt = writer
   new_device =  device :some_name
   wrt.add_device new_device

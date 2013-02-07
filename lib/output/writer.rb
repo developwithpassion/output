@@ -60,14 +60,45 @@ module Output
     end
 
     def add_device(device)
+      raise "The device #{device.name} has already been added" if devices.include?(device)
       devices.push device
       @logger.add_appenders device
       device
     end
 
+    def find_device(name)
+      devices.first { |device| device.name == name.to_s }
+    end
+
+    def find_device(name)
+      devices.first { |device| device.name == name.to_s }
+    end
+
     def remove_device(device)
       devices.delete device
       @logger.remove_appenders device
+      device
+    end
+
+    def logging_appender?(arg)
+      arg.is_a? Logging::Appender
+    end
+
+    def suspend_device(device, &block)
+      return suspend_device__obj device, &block if logging_appender?(device)
+
+      suspend_device__name device, &block
+    end
+
+    def suspend_device__name(name, &block)
+      device = find_device name
+      suspend_device__obj device, &block
+    end
+
+    def suspend_device__obj(device, &block)
+      remove_device device
+      yield
+      add_device device
       device
     end
 
@@ -86,14 +117,18 @@ module Output
     def push_device(device, options = {},  &block)
       return push_device__obj(device, &block) if device.is_a? Logging::Appender
 
-      push_device__from_opts device, options, &block
+      push_device__opts device, options, &block
     end
 
-    def push_device__from_opts(device_type, options = {}, &block)
+    def push_device__opts(device_type, options = {}, &block)
       options = options.merge(:device => device_type)
+      name = options[:name] || device_type 
+      raise "The device #{name} has already been pushed" unless find_device(name).nil?
+
       options = self.device_options.merge(options)
 
-      device = Output::Devices.build_device(:anon, options)
+
+      device = Output::Devices.build_device(name, options)
       push_device__obj device, &block
     end
 

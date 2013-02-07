@@ -49,4 +49,20 @@ heading 'Adding a device' do
 
     wrt.prove { logger_device? new_device }
   end
+
+  proof 'Cannot add the same device multiple times' do
+    wrt = writer
+    new_device =  device :some_name
+    failed = false
+
+    wrt.add_device new_device
+    begin
+      wrt.add_device new_device
+    rescue
+      failed = true
+    end
+
+    failed.prove { self == true }
+
+  end
 end

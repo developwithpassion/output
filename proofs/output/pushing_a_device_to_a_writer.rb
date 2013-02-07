@@ -153,7 +153,7 @@ heading 'Pushing an device using default options' do
     dvc.prove { attributes_match? wrt.device_options }
   end
 
-  proof 'Device is the specified device type' do
+  proof 'Device is the requested device type' do
     wrt = writer
 
     dvc = wrt.push_device :string_io
@@ -162,8 +162,8 @@ heading 'Pushing an device using default options' do
 
 end
 
-heading 'Pushing an device using specified options' do
-  proof 'Device options are set from specified options' do
+heading 'Pushing an device using options' do
+  proof 'Device options are initialized from options' do
     wrt = writer
     pattern = '%m %m \n'
 
@@ -173,4 +173,18 @@ heading 'Pushing an device using specified options' do
 
     dvc.prove { attributes_match? new_options }
   end
+
+  proof 'Fails if attempting to push the same named device more than once' do
+    wrt = writer
+    failed = false
+
+    dvc = wrt.push_device :string_io
+    begin
+      second = wrt.push_device :string_io
+    rescue
+      failed = true
+    end
+    failed.prove { self == true }
+  end
 end
+
