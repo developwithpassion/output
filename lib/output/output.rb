@@ -96,7 +96,7 @@ module Output
   end
 
   def push_device__obj(device, &block)
-    each_writer do|writer|
+    each_writer do |writer|
       writer.push_device device
     end
     if block_given?
@@ -107,7 +107,7 @@ module Output
   end
 
   def pop_device
-    each_writer do|writer|
+    each_writer do |writer|
       writer.pop_device
     end
     nil

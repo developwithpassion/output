@@ -30,7 +30,8 @@ module Output
     end
 
     def enabled?
-      @enabled ||= true
+      @enabled = true if @enabled.nil?
+      @enabled
     end
 
     def logger_level
@@ -55,7 +56,7 @@ module Output
 
     def write(message)
       message = message_transformer.call message if message_transformer
-      @logger.send level, message if enabled?
+      @logger.send level, message if self.enabled?
     end
 
     def add_device(device)
