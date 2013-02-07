@@ -61,7 +61,7 @@ heading 'When pushing a level and a block is provided' do
     contents.prove { self.match "This should write" }
   end
 
-  proof 'Output goes back to its previous level after the block run' do
+  proof 'Output goes back to its previous level after the block runs' do
     otp = output
     level_before_push = otp.level
 
