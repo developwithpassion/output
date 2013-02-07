@@ -1,57 +1,45 @@
 require_relative '../proofs_init'
 
 
-module Sketch
+module DevicesDemo
   class Output
     include Single
     include ::Output
 
     level :info
-    device :file
-    pattern '%m\n'
 
+    device :file # Default device
+    pattern '%m\n' # Default pattern
+
+    # Define a writer that writes to string_io
     writer :string_io, :level => :info, :device => :string_io
+    #
+    # Define a writer that writes to stdout
     writer :stdout, :level => :info, :device => :stdout
+    
+    # Define a writer that writes to a rolling file named
+    # some_log.txt
     writer :file, :level => :info, :filename => 'some_log.txt'
   end
 end
 
 
-def new_output
-  Sketch::Output.new
+def output
+  DevicesDemo::Output.new
 end
 
-output = new_output
+otp = output
 
+# Write to the different writers
 output.string_io 'Hello String IO'
 output.stdout 'Hello Std Out'
 output.file 'Hello File'
 output.file 'Hello again File'
 
+# Temporarily push a new string_io device to a writer
 device = output.file_writer.push_device_from_opts(:string_io) do
   output.file 'This should go to both devices'
 end
 puts device.read
 
 
-# writer.push_device(:string_io) # => pattern is defaulted to '%m\n'
-# 
-# #
-# 
-# writer.push_device__obj
-# writer.push_device__spec
-# 
-# #
-# 
-# writer.push_device device
-# writer.push_device Outut::Devices.string_io('%m\n')
-# 
-# writer.write 'foos'
-# writer.pop_device
-# 
-# 
-# 
-# 
-# writer :foo, :level => :debug, :device => :stdout, :pattern => '[%d] %-5l %c: %m\n'
-# writer.push_device(:string_io)
-# 
