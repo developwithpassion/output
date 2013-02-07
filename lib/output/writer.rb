@@ -34,7 +34,7 @@ module Output
     end
 
     def logger_level
-      Util.level_name @logger.level
+      @logger.level_name
     end
 
     def logger_level=(level)
@@ -114,16 +114,6 @@ module Output
 
       def camel_case(name)
         name.to_s.split('_').collect { |s| s.capitalize }.join
-      end
-    end
-
-    module Util
-      extend self
-
-      def level_name(level_number)
-        level_names = Logging::LNAMES
-        level_name =  Logging::levelify level_names[level_number]
-        level_name.to_sym
       end
     end
   end
