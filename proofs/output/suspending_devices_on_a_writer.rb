@@ -1,6 +1,6 @@
 require_relative '../proofs_init'
 
-title 'Suspending A Writer Device'
+title 'Suspending Devices On A Writer'
 
 module Output
   class Writer
