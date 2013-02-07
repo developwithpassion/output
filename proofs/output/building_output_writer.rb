@@ -4,7 +4,7 @@ title "Building a Writer on an Output"
 
 heading "Writer's logger level is set to the Output object's level when the writer is built"
 
-module AssignWriter
+module BuildingAWriterOnAnOutputProofs
   class Output
     include ::Output
 
@@ -25,7 +25,7 @@ module Output
 end
 
 def output
-  AssignWriter::Output.new
+  BuildingAWriterOnAnOutputProofs::Output.new
 end
 
 proof "Writer's logger level is the output's level" do

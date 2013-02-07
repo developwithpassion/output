@@ -46,8 +46,20 @@ module Output
     level
   end
 
+  def initial_level?
+    level == self.class.logger_level
+  end
+
   def levels
     @levels ||= []
+  end
+
+  def reset_level
+    @level = self.class.logger_level
+
+    each_writer do |writer|
+      writer.reset_level
+    end
   end
 
   def push_level(level)

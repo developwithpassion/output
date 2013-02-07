@@ -2,7 +2,7 @@ require_relative '../proofs_init'
 
 title "Defining Device Builder"
 
-module DefiningAnDeviceBuilderProofs
+module DefiningDeviceBuilderProofs
   class Example
     include Output::Devices::Builder
 
@@ -23,7 +23,7 @@ module DefiningAnDeviceBuilderProofs
 end
 
 def example
-  DefiningAnDeviceBuilderProofs::Example
+  DefiningDeviceBuilderProofs::Example
 end
 
 proof 'Stores list of required options' do

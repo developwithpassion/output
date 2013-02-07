@@ -41,6 +41,14 @@ module Output
       @logger.level = level
     end
 
+    def reset_level
+      self.logger_level = level
+    end
+
+    def initial_logger_level?
+      logger_level == level
+    end
+
     def logger_name
       @logger.name
     end

@@ -3,7 +3,7 @@ require 'ostruct'
 
 title "Writer Macro"
 
-module Macro
+module WriterMacroProofs
   class Output
     include ::Output
   end
@@ -25,7 +25,7 @@ module Output
       end
 
       def gets?(name, writer)
-        output = Macro::Output.new
+        output = WriterMacroProofs::Output.new
 
         output_writer = output.instance_variable_get :@something_writer
         output.instance_variable_set :@something_writer, writer
@@ -38,7 +38,7 @@ module Output
       end
 
       def sets?(name, writer)
-        output = Macro::Output.new
+        output = WriterMacroProofs::Output.new
 
         output_writer = output.instance_variable_get :@something_writer
 
@@ -53,7 +53,7 @@ module Output
       def created_lazily?(name)
         define_getter
 
-        output = Macro::Output.new
+        output = WriterMacroProofs::Output.new
 
         output_writer = output.instance_variable_get :"@#{name}"
         output.instance_variable_set :"@#{name}", nil
@@ -72,47 +72,47 @@ module Output
   end
 end
 
-def new_macro
-  macro = Output::WriterMacro.new Macro::Output, :something, :debug, Macro::Output::build_device_options, ->(text) {text}
+def macro
+  macro = Output::WriterMacro.new WriterMacroProofs::Output, :something, :debug, WriterMacroProofs::Output::build_device_options, ->(text) {text}
 end
 
 proof "Defines a getter for the writer" do
-  macro = new_macro
+  mcr = macro
 
-  macro.define_getter
-  macro.prove { getter? :something_writer }
+  mcr.define_getter
+  mcr.prove { getter? :something_writer }
 end
 
 proof "Defines a setter for the writer" do
-  macro = new_macro
+  mcr = macro
 
-  macro.define_setter
-  macro.prove { setter? :something_writer }
+  mcr.define_setter
+  mcr.prove { setter? :something_writer }
 end
 
 proof "Defines the write method for the writer" do
-  macro = new_macro
+  mcr = macro
 
-  macro.define_write_method
-  macro.prove { writes? :something }
+  mcr.define_write_method
+  mcr.prove { writes? :something }
 end
 
 proof "Access to writers is provided by their getters" do
-  macro = new_macro
+  mcr = macro
 
   some_writer = OpenStruct.new
-  macro.prove { gets? :something_writer, some_writer }
+  mcr.prove { gets? :something_writer, some_writer }
 end
 
 proof "Writers are assigned lazily upon access of their getters" do
-  macro = new_macro
+  mcr = macro
 
-  macro.prove { created_lazily? :something_writer }
+  mcr.prove { created_lazily? :something_writer }
 end
 
 proof "Assignment of writers is provided by their setters" do
-  macro = new_macro
+  mcr = macro
 
   some_writer = OpenStruct.new
-  macro.prove { sets? :something_writer, some_writer }
+  mcr.prove { sets? :something_writer, some_writer }
 end

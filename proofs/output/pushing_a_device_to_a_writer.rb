@@ -1,6 +1,6 @@
 require_relative '../proofs_init'
 
-title 'Pushing An Device To A Writer'
+title 'Pushing A Device To A Writer'
 
 module Output
   class Writer
@@ -37,11 +37,11 @@ module Logging
   end
 end
 
-def new_device
+def device
   Logging.appenders.string_io(:first)
 end
 
-def new_writer(device_options = nil)
+def writer(device_options = nil)
   device_options ||= { :device => :stdout, :pattern => '%m\n' }
   logger = Logging::logger['First']
   logger.level = :debug
@@ -50,126 +50,127 @@ def new_writer(device_options = nil)
 end
 
 heading 'Pushing an device' do
-  device = new_device
+  dvc = device
 
   proof 'Device is added to list of devices' do
-    writer = new_writer
+    wrt = writer
 
-    writer.push_device device
+    wrt.push_device dvc
 
-    writer.prove { device? device }
+    wrt.prove { device? dvc }
   end
   proof 'Device is added to its loggers devices' do
-    writer = new_writer
+    wrt = writer
 
-    writer.push_device device
+    wrt.push_device dvc
 
-    writer.prove { logger_device? device }
+    wrt.prove { logger_device? dvc }
   end
 end
 
 heading 'Pushing an device that the writer already has' do
-  device = new_device
+  dvc = device
 
   proof 'Device is not re-added to its list of devices' do
-    writer = new_writer
+    wrt = writer
 
-    writer.push_device device
-    writer.push_device device
+    wrt.push_device dvc
+    wrt.push_device dvc
 
-    writer.prove { devices? device, count = 1 }
+    wrt.prove { devices? dvc, count = 1 }
 
   end
 
   proof 'Device is not re-added to its loggers devices' do
-    writer = new_writer
+    wrt = writer
 
-    writer.push_device device
-    writer.push_device device
+    wrt.push_device dvc
+    wrt.push_device dvc
 
-    writer.prove { logger_devices? device, count = 1 }
+    wrt.prove { logger_devices? dvc, count = 1 }
 
   end
 end
 
 heading 'Pushing an device with a block' do
-  device = new_device
+  dvc = device
 
   proof 'Device is added to list of devices' do
-    writer = new_writer
+    wrt = writer
 
-    writer.push_device device do
-      writer.prove { device? device }
+    wrt.push_device dvc do
+      wrt.prove { device? dvc }
     end
   end
-  proof 'Device is added to its loggers devices' do
-    writer = new_writer
 
-    writer.push_device device do
-      writer.prove { logger_device? device }
+  proof 'Device is added to its loggers devices' do
+    wrt = writer
+
+    wrt.push_device dvc do
+      wrt.prove { logger_device? dvc }
     end
   end
 
   proof 'Device is removed from its list of devices after running the block' do
-    writer = new_writer
+    wrt = writer
 
-    writer.push_device device do
+    wrt.push_device dvc do
     end
-    writer.prove { !device? device }
+    wrt.prove { !device? dvc }
   end
 
   proof 'Device is removed from its loggers devices after running the block' do
-    writer = new_writer
+    wrt = writer
 
-    writer.push_device device do
+    wrt.push_device dvc do
     end
-    writer.prove { !logger_device? device }
+    wrt.prove { !logger_device? dvc }
   end
 end
 
 heading 'Pushing an device using default options' do
   proof 'Device is added to list of devices' do
-    writer = new_writer
+    wrt = writer
 
-    device = writer.push_device_from_opts :string_io
+    dvc = wrt.push_device_from_opts :string_io
 
-    writer.prove { device? device }
+    wrt.prove { device? dvc }
   end
 
   proof 'Device is added to loggers devices' do
-    writer = new_writer
+    wrt = writer
 
-    device = writer.push_device_from_opts :string_io
+    dvc = wrt.push_device_from_opts :string_io
 
-    writer.prove { logger_device? device }
+    wrt.prove { logger_device? dvc }
   end
 
   proof 'Device options are set from writers device options' do
-    writer = new_writer
+    wrt = writer
 
-    device = writer.push_device_from_opts :string_io
+    dvc = wrt.push_device_from_opts :string_io
 
-    device.prove { attributes_match? writer.device_options }
+    dvc.prove { attributes_match? wrt.device_options }
   end
 
   proof 'Device is the specified device type' do
-    writer = new_writer
+    wrt = writer
 
-    device = writer.push_device_from_opts :string_io
-    device.prove { self.class == Logging::Appenders::StringIo }
+    dvc = wrt.push_device_from_opts :string_io
+    dvc.prove { self.class == Logging::Appenders::StringIo }
   end
 
 end
 
 heading 'Pushing an device using specified options' do
   proof 'Device options are set from specified options' do
-    writer = new_writer
+    wrt = writer
     pattern = '%m %m \n'
 
     new_options = { :pattern => pattern }
 
-    device = writer.push_device_from_opts :string_io, new_options
+    dvc = wrt.push_device_from_opts :string_io, new_options
 
-    device.prove { attributes_match? new_options }
+    dvc.prove { attributes_match? new_options }
   end
 end

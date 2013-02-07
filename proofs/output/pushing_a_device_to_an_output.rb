@@ -1,8 +1,8 @@
 require_relative '../proofs_init'
 
-title 'Pushing An Device To Output'
+title 'Pushing A Device To An Output'
 
-module PushingAnDeviceToOutputProofs
+module PushingADeviceToOutputProofs
   class Example
     include Output
 
@@ -22,75 +22,75 @@ module PushingAnDeviceToOutputProofs
 end
 
 
-def new_device
+def device
   Logging.appenders.string_io(:first)
 end
 
-def new_output
+def output
   logger = Logging::logger['First']
   logger.level = :debug
 
-  PushingAnDeviceToOutputProofs::Example.new
+  PushingADeviceToOutputProofs::Example.new
 end
 
 heading 'Pushing a device' do
   proof 'Pushes it to all of its writers' do
-    device = new_device
-    output = new_output
+    dvc = device
+    opt = output
 
-    output.push_device device
-    output.prove { device? device }
+    opt.push_device dvc
+    opt.prove { device? dvc }
   end
 end
 
 
 heading 'Pushing a device with a block' do
-  device = new_device
+  dvc = device
 
   proof 'Pushes it to all of the writers devices' do
-    output = new_output
+    opt = output
 
-    output.push_device device
+    opt.push_device dvc
 
-    output.prove { device? device }
+    opt.prove { device? dvc }
   end
 
   proof 'Pops the device from all of its writers after the block has run' do
-    output = new_output
+    opt = output
 
-    output.push_device device do
+    opt.push_device dvc do
     end
 
-    output.prove { !device?(device) }
+    opt.prove { !device?(dvc) }
   end
 end
 
 heading 'Pushing a device using options' do
   proof 'Pushes the device to all of its writers' do
-    output = new_output
+    opt = output
 
-    device = output.push_device_from_opts(:string_io)
+    dvc = opt.push_device_from_opts(:string_io)
 
-    output.prove { device? device }
+    opt.prove { device? dvc }
   end
 
   proof 'Runs a block if provided' do
-    output = new_output
+    opt = output
     ran = false
 
-    device = output.push_device_from_opts(:string_io) do
+    dvc = opt.push_device_from_opts(:string_io) do
       ran = true
     end
 
     ran.prove { self == true }
   end
   proof 'Pops the device from all of its writers after block is run' do
-    output = new_output
+    opt = output
 
-    device = output.push_device_from_opts(:string_io) do
+    dvc = opt.push_device_from_opts(:string_io) do
     end
 
-    output.prove { not device? device }
+    opt.prove { not device? dvc }
 
   end
 end
