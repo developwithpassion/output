@@ -121,13 +121,10 @@ module Output
       push_device__opts(device, options, &block)
     end
 
-    def push_device__opts(device_type, options = {}, &block)
-      options = options.merge(:device => device_type)
-      name = options[:name] || device_type 
-      raise "The device #{name} has already been pushed" unless device(name).nil?
-
+    def push_device__opts(name, options = {}, &block)
       options = self.device_options.merge(options)
 
+      raise "The device #{name} has already been pushed" unless device(name).nil?
 
       device = Output::Devices.build_device(name, options)
       push_device__obj device, &block

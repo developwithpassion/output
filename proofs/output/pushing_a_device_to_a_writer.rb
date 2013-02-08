@@ -28,25 +28,23 @@ module Output
 end
 
 module Logging
-  module Appenders
-    class StringIo
-      def attributes_match?(options)
-        self.layout.pattern = options[:pattern]
-      end
+  class Appender
+    def attributes_match?(options)
+      self.layout.pattern = options[:pattern]
     end
   end
 end
 
-def device
-  Logging.appenders.string_io(:first)
+def device_options
+  { :device => :stdout, :pattern => '%m\n' }
 end
 
-def writer(device_options = nil)
-  device_options ||= { :device => :stdout, :pattern => '%m\n' }
-  logger = Logging::logger['First']
-  logger.level = :debug
+def device
+  Output::Devices.build_device(:first, device_options)
+end
 
-  Output::Writer.new 'first',:debug, nil, logger, device_options
+def writer
+  Output::Writer.build 'first',:debug, nil, :debug, nil, device_options
 end
 
 heading 'Pushing an device' do
@@ -109,7 +107,7 @@ heading 'Pushing an device using default options' do
   proof 'Device is added to list of devices' do
     wrt = writer
 
-    dvc = wrt.push_device :string_io
+    dvc = wrt.push_device :some_name
 
     wrt.prove { device? dvc }
   end
@@ -117,7 +115,7 @@ heading 'Pushing an device using default options' do
   proof 'Device is added to loggers devices' do
     wrt = writer
 
-    dvc = wrt.push_device :string_io
+    dvc = wrt.push_device :some_name
 
     wrt.prove { logger_device? dvc }
   end
@@ -125,7 +123,7 @@ heading 'Pushing an device using default options' do
   proof 'Device options are set from writers device options' do
     wrt = writer
 
-    dvc = wrt.push_device :string_io
+    dvc = wrt.push_device :some_name
 
     dvc.prove { attributes_match? wrt.device_options }
   end
@@ -133,7 +131,7 @@ heading 'Pushing an device using default options' do
   proof 'Device is the requested device type' do
     wrt = writer
 
-    dvc = wrt.push_device :string_io
+    dvc = wrt.push_device :some_name, :device => :string_io
     dvc.prove { self.class == Logging::Appenders::StringIo }
   end
 
@@ -144,9 +142,9 @@ heading 'Pushing an device using options' do
     wrt = writer
     pattern = '%m %m \n'
 
-    new_options = { :pattern => pattern }
+    new_options = { :pattern => pattern, :device => :string_io }
 
-    dvc = wrt.push_device :string_io, new_options
+    dvc = wrt.push_device :some_name, new_options
 
     dvc.prove { attributes_match? new_options }
   end
@@ -155,9 +153,9 @@ heading 'Pushing an device using options' do
     wrt = writer
     failed = false
 
-    dvc = wrt.push_device :string_io
+    dvc = wrt.push_device :some_name
     begin
-      second = wrt.push_device :string_io
+      second = wrt.push_device :some_name
     rescue
       failed = true
     end

@@ -31,7 +31,8 @@ module Output
   end
 
   def build_writer(name, level, device_options = nil, message_transformer=nil)
-    device_options ||= self.class.build_device_options
+    device_options ||= {}
+    device_options = self.class.build_device_options device_options
     logger_name = Writer::Naming.fully_qualified(self.class, name)
     writer = Writer.build name, level, message_transformer, self.level, logger_name, device_options
     writer
@@ -119,13 +120,11 @@ module Output
     push_device__opts(device, options, &block)
   end
 
-  def push_device__opts(device_type, options = {}, &block)
-    options = options.merge(:device => device_type)
-    name = options[:name] || device_type 
+  def push_device__opts(device, options = {}, &block)
     options = self.class.build_device_options.merge(options)
 
-    device = Output::Devices.build_device(name, options)
-    push_device__obj device, &block
+    dvc = Output::Devices.build_device(device, options)
+    push_device__obj dvc, &block
   end
 
   def push_device__obj(device, &block)
