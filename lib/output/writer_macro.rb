@@ -53,6 +53,7 @@ module Output
       name = self.name
       output_class.send :define_method, name do |message|
         writer(name).write message
+        self.last_method = name
         message
       end
     end

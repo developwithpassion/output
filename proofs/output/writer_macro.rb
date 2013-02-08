@@ -73,7 +73,7 @@ module Output
 end
 
 def macro
-  macro = Output::WriterMacro.new WriterMacroProofs::Output, :something, :debug, WriterMacroProofs::Output::build_device_options, ->(text) {text}
+  macro = Output::WriterMacro.new WriterMacroProofs::Output, :something, :debug, WriterMacroProofs::Output::device_options, ->(text) {text}
 end
 
 proof "Defines a getter for the writer" do

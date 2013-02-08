@@ -36,3 +36,16 @@ end
 proof 'Is initially enabled' do
   writer.prove { enabled? }
 end
+
+proof 'Can be disabled' do
+  wtr = writer
+  wtr.disable
+  wtr.prove { not enabled? }
+end
+
+proof 'Can be re-enabled' do
+  wtr = writer
+  wtr.disable
+  wtr.enable
+  wtr.prove { enabled? }
+end

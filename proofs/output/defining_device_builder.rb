@@ -10,7 +10,7 @@ module DefiningDeviceBuilderProofs
 
     module Proof
       def required?(*keys)
-        keys.all? do|key|
+        keys.all? do |key|
           all_required_options.include?(key)
         end
       end

@@ -28,25 +28,23 @@ module Output
 end
 
 module Logging
-  module Appenders
-    class StringIo
-      def attributes_match?(options)
-        self.layout.pattern = options[:pattern]
-      end
+  class Appender
+    def attributes_match?(options)
+      self.layout.pattern = options[:pattern]
     end
   end
 end
 
-def device
-  Logging.appenders.string_io(:first)
+def device_options
+  { :device => :stdout, :pattern => '%m\n' }
 end
 
-def writer(device_options = nil)
-  device_options ||= { :device => :stdout, :pattern => '%m\n' }
-  logger = Logging::logger['First']
-  logger.level = :debug
+def device
+  Output::Devices.build_device(:stdout, device_options)
+end
 
-  Output::Writer.new 'first',:debug, nil, logger, device_options
+def writer
+  Output::Writer.build 'first',:debug, nil, :debug, nil, device_options
 end
 
 heading 'Pushing an device' do
@@ -68,29 +66,6 @@ heading 'Pushing an device' do
   end
 end
 
-heading 'Pushing an device that the writer already has' do
-  dvc = device
-
-  proof 'Device is not re-added to its list of devices' do
-    wrt = writer
-
-    wrt.push_device dvc
-    wrt.push_device dvc
-
-    wrt.prove { devices? dvc, count = 1 }
-
-  end
-
-  proof 'Device is not re-added to its loggers devices' do
-    wrt = writer
-
-    wrt.push_device dvc
-    wrt.push_device dvc
-
-    wrt.prove { logger_devices? dvc, count = 1 }
-
-  end
-end
 
 heading 'Pushing an device with a block' do
   dvc = device
@@ -153,7 +128,7 @@ heading 'Pushing an device using default options' do
     dvc.prove { attributes_match? wrt.device_options }
   end
 
-  proof 'Device is the specified device type' do
+  proof 'Device is the requested device type' do
     wrt = writer
 
     dvc = wrt.push_device :string_io
@@ -162,15 +137,29 @@ heading 'Pushing an device using default options' do
 
 end
 
-heading 'Pushing an device using specified options' do
-  proof 'Device options are set from specified options' do
+heading 'Pushing an device using options' do
+  proof 'Device options are initialized from options' do
     wrt = writer
     pattern = '%m %m \n'
 
-    new_options = { :pattern => pattern }
+    new_options = { :pattern => pattern, :name => :some_name }
 
     dvc = wrt.push_device :string_io, new_options
 
     dvc.prove { attributes_match? new_options }
   end
+
+  proof 'Fails if attempting to push the same named device more than once' do
+    wrt = writer
+    failed = false
+
+    dvc = wrt.push_device :string_io
+    begin
+      second = wrt.push_device :string_io
+    rescue
+      failed = true
+    end
+    failed.prove { failed }
+  end
 end
+

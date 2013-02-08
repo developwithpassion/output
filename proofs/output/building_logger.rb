@@ -19,6 +19,14 @@ module Logging
   end
 end
 
+def device_options
+  { :name => :stdout, :pattern => '%m\n' }
+end
+
+def writer
+  Output::Writer.build 'first',:debug, nil, :debug, nil, device_options
+end
+
 def logger
   name = 'some name'
   level = :info

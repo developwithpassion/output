@@ -23,13 +23,10 @@ end
 
 
 def device
-  Logging.appenders.string_io(:first)
+  Output::Devices.build_device(:string_io, :name => :some_name, :pattern => '%m\n') 
 end
 
 def output
-  logger = Logging::logger['First']
-  logger.level = :debug
-
   PushingADeviceToOutputProofs::Example.new
 end
 
@@ -40,6 +37,18 @@ heading 'Pushing a device' do
 
     opt.push_device dvc
     opt.prove { device? dvc }
+  end
+
+  proof 'Fails to push the same device multiple times' do
+    opt = output
+
+    opt.push_device :string_io
+    begin
+      opt.push_device :string_io
+      opt.prove { false }
+    rescue
+      opt.prove { true }
+    end
   end
 end
 

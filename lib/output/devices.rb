@@ -1,17 +1,22 @@
 module Output
   module Devices
-    def self.build_device(name, device_options)
+    def self.build_device(type, options = {})
       builders = { 
         :stdout => Builder::Stdout,
         :string_io => Builder::StringIo,
         :file => Builder::File,
       }
-      builder = builders[device_options[:device]]
-      builder.build(name, device_options)
+
+      default_options = { :name => type, :pattern => DEFAULT_PATTERN }
+      options = default_options.merge(options)
+      name = options[:name]
+
+      builder = builders[type]
+      builder.build(name, options)
     end
 
     module Builder
-      def layout(pattern = '%m\n')
+      def layout(pattern = Output::Devices::DEFAULT_PATTERN)
         Logging.layouts.pattern(:pattern => pattern)
       end
 

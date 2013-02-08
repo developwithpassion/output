@@ -12,6 +12,14 @@ module Output
 
   def disable
     each_writer { |w| w.disable }
+    if block_given?
+      yield
+      enable
+    end
+  end
+
+  def enable
+    each_writer { |w| w.enable }
   end
 
   def write(method, message)
@@ -22,8 +30,21 @@ module Output
     send self.class.writer_attribute(name)
   end
 
+  def last_method
+    @last_method
+  end
+
+  def last_method=(val)
+    @last_method = val
+  end
+
+  def last_method?(*methods)
+    methods.include? last_method
+  end
+
   def build_writer(name, level, device_options = nil, message_transformer=nil)
-    device_options ||= self.class.build_device_options
+    device_options ||= {}
+    device_options = self.class.device_options.merge device_options
     logger_name = Writer::Naming.fully_qualified(self.class, name)
     writer = Writer.build name, level, message_transformer, self.level, logger_name, device_options
     writer
@@ -80,23 +101,54 @@ module Output
     level
   end
 
+  def suspend_devices(device, &block)
+    return suspend_devices__obj(device, &block) if device.is_a? Logging::Appender
+
+    suspend_devices__name device, &block
+  end
+
+
+  def suspend_devices__name(name, &block)
+    device_selector = ->(writer) { writer.device name }
+
+    suspend_devices__device_selector device_selector, &block
+  end
+
+  def suspend_devices__device_selector(device_selector, &block)
+    suspensions = []
+    each_writer do |writer|
+      device = device_selector.call writer
+      suspension = Writer::WriterDeviceSuspension.new writer, device
+      suspensions << suspension
+      suspension.suspend
+    end
+    yield
+    suspensions.each do |suspension|
+      suspension.restore
+    end
+  end
+
+  def suspend_devices__obj(device, &block)
+    device_selector = ->(writer) { device }
+
+    suspend_devices__device_selector device_selector, &block
+  end
 
   def push_device(device, options = {}, &block)
     return push_device__obj(device, &block) if device.is_a? Logging::Appender
 
-    push_device__from_opts(device, options, &block)
+    push_device__opts(type = device, options, &block)
   end
 
-  def push_device__from_opts(device_type, options = {}, &block)
-    options = options.merge(:device => device_type)
-    options = self.class.build_device_options.merge(options)
+  def push_device__opts(type, options = {}, &block)
+    options = self.class.device_options.merge(options)
 
-    device = Output::Devices.build_device(:anon, options)
-    push_device__obj device, &block
+    dvc = Output::Devices.build_device(type, options)
+    push_device__obj dvc, &block
   end
 
   def push_device__obj(device, &block)
-    each_writer do|writer|
+    each_writer do |writer|
       writer.push_device device
     end
     if block_given?
@@ -107,7 +159,7 @@ module Output
   end
 
   def pop_device
-    each_writer do|writer|
+    each_writer do |writer|
       writer.pop_device
     end
     nil
@@ -145,19 +197,19 @@ module Output
       @writer_names ||= []
     end
 
-    def build_device_options(options = {})
+    def device_options
       device_options = {}
-      device_options[:device] = options[:device] || default_device_type
-      device_options[:pattern] = options[:pattern] || default_pattern
-      device_options = device_options.merge(options)
+      device_options[:device] = default_device_type
+      device_options[:name] = default_device_type
+      device_options[:pattern] = default_pattern
       device_options
     end
 
     def writer_macro(name, options = {}, &message_transformer)
       level = options[:level] || logger_level
-      device_options = build_device_options(options)
+      options = device_options.merge(options)
 
-      WriterMacro.define_writer self, name, level, device_options,  message_transformer
+      WriterMacro.define_writer self, name, level, options,  message_transformer
       writer_names << name
     end
 

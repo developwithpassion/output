@@ -30,7 +30,8 @@ module Output
     end
 
     def enabled?
-      @enabled ||= true
+      @enabled = true if @enabled.nil?
+      @enabled
     end
 
     def logger_level
@@ -55,23 +56,87 @@ module Output
 
     def write(message)
       message = message_transformer.call message if message_transformer
-      @logger.send level, message if enabled?
+      @logger.send level, message if self.enabled?
     end
 
     def add_device(device)
-      devices.push device
       @logger.add_appenders device
       device
     end
 
+    def device(name)
+      result = nil
+      logger.appenders.each do|device|
+        result = device if device.name == name.to_s
+      end
+      result
+    end
+
+    def logger_device?(device)
+      logger.appenders.include? device
+    end
+
+
+
     def remove_device(device)
-      devices.delete device
       @logger.remove_appenders device
       device
     end
 
-    def push_device__obj(device)
-      return if devices.include?(device)
+    def logging_appender?(arg)
+      arg.is_a? Logging::Appender
+    end
+
+    def suspend_device(device, &block)
+      return suspend_device__obj device, &block if logging_appender?(device)
+
+      suspend_device__name device, &block
+    end
+
+    def suspend_device__name(name, &block)
+      dvc = device name
+      suspend_device__obj dvc, &block
+    end
+
+    class WriterDeviceSuspension
+      include Initializer
+
+      attr_accessor :logger_device
+      attr_accessor :writer_device
+
+      initializer :writer, :device
+
+      def restore
+        unless device.nil?
+          writer.push_device device if (writer_device)
+          writer.add_device device if (logger_device)
+        end
+      end
+
+      def suspend
+        self.logger_device = writer.logger_device? device
+        self.writer_device = writer.device? device
+
+        writer.remove_device device if logger_device
+        writer.devices.delete device if writer_device
+      end
+    end
+
+    def suspend_device__obj(device, &block)
+      suspension = WriterDeviceSuspension.new self, device
+      suspension.suspend
+
+      if block_given?
+        yield
+        suspension.restore
+      end
+      device
+    end
+
+    def push_device__obj(device, &block)
+      raise "The device #{device.name} has already been pushed" if device?(device)
+
+      devices.push device
 
       add_device device
 
@@ -85,14 +150,16 @@ module Output
     def push_device(device, options = {},  &block)
       return push_device__obj(device, &block) if device.is_a? Logging::Appender
 
-      push_device__from_opts device, options, &block
+      push_device__opts(type = device, options, &block)
     end
 
-    def push_device__from_opts(device_type, options = {}, &block)
-      options = options.merge(:device => device_type)
+    def push_device__opts(type, options = {}, &block)
       options = self.device_options.merge(options)
+      name = options[:name] || type
 
-      device = Output::Devices.build_device(:anon, options)
+      raise "Writer:[#{self.name}] - already has a device named [#{name}]. It cannot be pushed the device again" unless device(name).nil?
+
+      device = Output::Devices.build_device(type, options)
       push_device__obj device, &block
     end
 
@@ -103,7 +170,7 @@ module Output
     end
 
     def device?(device)
-      devices.include?(device)
+      devices.include?(device) || devices.any? { |dvc| dvc.name == device.name }
     end
 
     class Attribute
