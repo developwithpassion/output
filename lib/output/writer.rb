@@ -98,19 +98,37 @@ module Output
       suspend_device__obj dvc, &block
     end
 
-    def suspend_device__obj(device, &block)
-      requires_push_back = device?(device)
-      logger_device = logger_device?(device)
+    class WriterSuspensionState
+      include Initializer
 
-      if requires_push_back || logger_device
-        remove_device device
-        devices.delete device
+      attr_accessor :logger_device
+      attr_accessor :writer_device
+
+      initializer :writer, :device
+
+      def restore
+        unless device.nil?
+          writer.push_device device if (writer_device)
+          writer.add_device device if (logger_device)
+        end
       end
+
+      def suspend
+        logger_device = writer.logger_device? device
+        writer_device = writer.device? device
+
+        writer.remove_device device if logger_device
+        writer.devices.delete device if writer_device
+      end
+    end
+
+    def suspend_device__obj(device, &block)
+      suspension_state = WriterSuspensionState.new self, device
+      suspension_state.suspend
 
       if block_given?
         yield
-        push_device__obj device if requires_push_back
-        add_device device if logger_device
+        suspension_state.restore
       end
       device
     end
