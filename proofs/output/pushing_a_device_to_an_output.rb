@@ -63,13 +63,13 @@ end
 
 heading 'Attempting to push a nil device with a block' do
   proof  do
-    dvc = device
+    dvc = nil
     opt = output
 
-    opt.push_device dvc do
-      desc 'Does not change the writers pushed devices'
-      opt.prove { device_count? 0 }
-    end
+    opt.push_device dvc 
+
+    desc 'Does not change the writers pushed devices'
+    opt.prove { device_count? 0 }
 
   end
 end
