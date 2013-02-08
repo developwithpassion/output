@@ -30,6 +30,18 @@ module Output
     send self.class.writer_attribute(name)
   end
 
+  def last_method
+    @last_method
+  end
+
+  def last_method=(val)
+    @last_method = val
+  end
+
+  def last_method?(*methods)
+    methods.include? last_method
+  end
+
   def build_writer(name, level, device_options = nil, message_transformer=nil)
     device_options ||= {}
     device_options = self.class.device_options.merge device_options
