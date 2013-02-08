@@ -117,13 +117,13 @@ module Output
   def push_device(device, options = {}, &block)
     return push_device__obj(device, &block) if device.is_a? Logging::Appender
 
-    push_device__opts(device, options, &block)
+    push_device__opts(type = device, options, &block)
   end
 
-  def push_device__opts(device, options = {}, &block)
+  def push_device__opts(type, options = {}, &block)
     options = self.class.device_options.merge(options)
 
-    dvc = Output::Devices.build_device(device, options)
+    dvc = Output::Devices.build_device(type, options)
     push_device__obj dvc, &block
   end
 

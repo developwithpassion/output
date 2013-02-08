@@ -127,7 +127,7 @@ module Output
       options = self.device_options.merge(options)
       name = options[:name] || type
 
-      raise "The device #{name} has already been pushed" unless device(name).nil?
+      raise "Writer:[#{self.name}] - already has a device named [#{name}]. It cannot be pushed the device again" unless device(name).nil?
 
       device = Output::Devices.build_device(type, options)
       push_device__obj device, &block
