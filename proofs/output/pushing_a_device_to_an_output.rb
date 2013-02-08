@@ -1,4 +1,7 @@
 require_relative '../proofs_init'
+require_relative 'builders'
+
+include OutputProofs
 
 title 'Pushing A Device To An Output'
 
@@ -23,7 +26,7 @@ end
 
 
 def device
-  Output::Devices.build_device(:string_io, :name => :some_name, :pattern => '%m\n') 
+  Builders.device
 end
 
 def output
@@ -54,22 +57,16 @@ end
 
 
 heading 'Pushing a device with a block' do
-  dvc = device
-
-  proof 'Pushes it to all of the writers devices' do
-    opt = output
-
-    opt.push_device dvc
-
-    opt.prove { device? dvc }
-  end
-
-  proof 'Pops the device from all of its writers after the block has run' do
+  proof  do
+    dvc = device
     opt = output
 
     opt.push_device dvc do
+      desc 'Pushes it to all of the writers devices'
+      opt.prove { device? dvc }
     end
 
+    desc 'Pops the device from all of its writers after the block has run'
     opt.prove { !device?(dvc) }
   end
 end
@@ -77,9 +74,9 @@ end
 heading 'Pushing a device using options' do
   proof 'Pushes the device to all of its writers' do
     opt = output
-
     dvc = opt.push_device(:string_io)
 
+    desc 'Pushes the device to all of its writers'
     opt.prove { device? dvc }
   end
 
@@ -88,10 +85,8 @@ heading 'Pushing a device using options' do
     ran = false
 
     dvc = opt.push_device(:string_io) do
-      ran = true
+      opt.prove { true }
     end
-
-    ran.prove { self == true }
   end
   proof 'Pops the device from all of its writers after block is run' do
     opt = output

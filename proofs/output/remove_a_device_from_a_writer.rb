@@ -1,4 +1,7 @@
 require_relative '../proofs_init'
+require_relative 'builders'
+
+include OutputProofs
 
 title 'Remove A Device From A Writer'
 
@@ -13,20 +16,17 @@ module Output
   end
 end
 
-def device_options
-  { :device => :stdout, :name => :first, :pattern => '%m\n' }
-end
 
 def device
-  Output::Devices.build_device(:stdout, device_options) 
+  Builders.device
 end
 
 def writer
-  Output::Writer.build 'first', :debug, nil, :debug, nil, device_options
+  Builders.writer
 end
 
 
-proof 'Remove the device from its loggers appenders' do
+proof "Remove the device from its logger's devices" do
   wrt = writer
   new_device =  device
   wrt.add_device new_device

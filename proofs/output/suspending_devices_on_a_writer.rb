@@ -1,4 +1,7 @@
 require_relative '../proofs_init'
+require_relative 'builders'
+
+include OutputProofs
 
 title 'Suspending Devices On A Writer'
 
@@ -17,11 +20,11 @@ module Output
 end
 
 def device_options(name)
-  { :name => name, :device => :stdout, :pattern => '%m\n' }
+  Builders.device_options(:name => name)
 end
 
 def device(name)
-  Output::Devices.build_device(:stdout, device_options(name)) 
+  Builders.device(:stdout, device_options(name)) 
 end
 
 def builder

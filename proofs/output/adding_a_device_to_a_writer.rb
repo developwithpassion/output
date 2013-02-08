@@ -1,4 +1,7 @@
 require_relative '../proofs_init'
+require_relative 'builders'
+
+include OutputProofs
 
 title 'Adding An Device To A Writer'
 
@@ -17,23 +20,11 @@ module Output
   end
 end
 
-def device_options
-  { :device => :stdout, :name => :stdout, :pattern => '%m\n' }
-end
+heading "Adding a device" do
 
-def device
-  Output::Devices.build_device(:stdout, device_options)
-end
-
-def writer
-  Output::Writer.build 'first',:debug, nil, :debug, nil, device_options
-end
-
-heading 'Adding a device' do
-
-  proof 'Adds the device to its loggers appenders' do
-    wrt = writer
-    new_device =  device
+  proof "Adds the device to its logger's devices" do
+    wrt = Builders.writer
+    new_device =  Builders.device
 
     wrt.add_device new_device
 

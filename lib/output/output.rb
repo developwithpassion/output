@@ -1,6 +1,5 @@
 require 'ostruct'
 
-
 module Output
   DEFAULT_LOGGER_LEVEL = :info
   DEFAULT_PATTERN = '%m\n'

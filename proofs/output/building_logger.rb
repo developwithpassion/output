@@ -1,6 +1,10 @@
 require_relative '../proofs_init'
+require_relative 'builders'
+
+include OutputProofs
 
 title 'Building a Logger'
+
 
 
 module Logging
@@ -19,21 +23,8 @@ module Logging
   end
 end
 
-def device_options
-  { :name => :stdout, :pattern => '%m\n' }
-end
-
-def writer
-  Output::Writer.build 'first',:debug, nil, :debug, nil, device_options
-end
-
 def logger
-  name = 'some name'
-  level = :info
-  device_options = { :device => :stdout, :pattern => '%m\n' }
-
-  logger = Output::Writer::BuildLogger::ClassMethods::build_logger(name, level, device_options)
-  logger
+  Builders.logger('some name')
 end
 
 proof 'Name is set' do

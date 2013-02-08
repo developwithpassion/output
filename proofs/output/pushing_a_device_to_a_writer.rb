@@ -1,18 +1,13 @@
 require_relative '../proofs_init'
+require_relative 'builders'
+
+include OutputProofs
 
 title 'Pushing A Device To A Writer'
 
 module Output
   class Writer
     module Proof
-      def device?(device)
-        devices.include?(device)
-      end
-
-      def logger_device?(device)
-        @logger.appenders.include?(device)
-      end
-
       def devices?(device, occurences)
         devices.include?(device) &&
           devices.count == occurences
@@ -35,33 +30,25 @@ module Logging
   end
 end
 
-def device_options
-  { :device => :stdout, :pattern => '%m\n' }
-end
-
 def device
-  Output::Devices.build_device(:stdout, device_options)
+  Builders.device
 end
 
 def writer
-  Output::Writer.build 'first',:debug, nil, :debug, nil, device_options
+  Builders.writer
 end
 
 heading 'Pushing an device' do
   dvc = device
+  wrt = writer
 
-  proof 'Device is added to list of devices' do
-    wrt = writer
+  wrt.push_device dvc
 
-    wrt.push_device dvc
-
+  proof do
+    desc "Device is added to its pushed devices"
     wrt.prove { device? dvc }
-  end
-  proof 'Device is added to its loggers devices' do
-    wrt = writer
 
-    wrt.push_device dvc
-
+    desc "Device is added to its logger's devices"
     wrt.prove { logger_device? dvc }
   end
 end
@@ -69,93 +56,67 @@ end
 
 heading 'Pushing an device with a block' do
   dvc = device
+  wrt = writer
 
-  proof 'Device is added to list of devices' do
-    wrt = writer
+  proof do
 
     wrt.push_device dvc do
+      desc 'Device is added to its pushed devices'
       wrt.prove { device? dvc }
-    end
-  end
 
-  proof 'Device is added to its loggers devices' do
-    wrt = writer
-
-    wrt.push_device dvc do
+      desc 'Device is added to its loggers devices'
       wrt.prove { logger_device? dvc }
     end
-  end
 
-  proof 'Device is removed from its list of devices after running the block' do
-    wrt = writer
-
-    wrt.push_device dvc do
-    end
+    desc 'Device is removed from its pushed devices after running the block'
     wrt.prove { !device? dvc }
-  end
 
-  proof 'Device is removed from its loggers devices after running the block' do
-    wrt = writer
-
-    wrt.push_device dvc do
-    end
+    desc 'Device is removed from its loggers devices after running the block'
     wrt.prove { !logger_device? dvc }
+
   end
 end
 
 heading 'Pushing an device using default options' do
-  proof 'Device is added to list of devices' do
+  proof do
     wrt = writer
 
-    dvc = wrt.push_device :string_io
+    dvc = wrt.push_device :string_io, :name => :pushing_with_options
 
+    desc 'Device is added to its pushed devices'
     wrt.prove { device? dvc }
-  end
 
-  proof 'Device is added to loggers devices' do
-    wrt = writer
-
-    dvc = wrt.push_device :string_io
-
+    desc "Device is added to its logger's devices"
     wrt.prove { logger_device? dvc }
-  end
 
-  proof 'Device options are set from writers device options' do
-    wrt = writer
-
-    dvc = wrt.push_device :string_io
-
+    desc "Device options are set from writers device options"
     dvc.prove { attributes_match? wrt.device_options }
-  end
 
-  proof 'Device is the requested device type' do
-    wrt = writer
-
-    dvc = wrt.push_device :string_io
+    desc 'Device is the requested device type'
     dvc.prove { self.class == Logging::Appenders::StringIo }
   end
-
 end
 
 heading 'Pushing an device using options' do
-  proof 'Device options are initialized from options' do
+  proof do
     wrt = writer
     pattern = '%m %m \n'
-
     new_options = { :pattern => pattern, :name => :some_name }
-
     dvc = wrt.push_device :string_io, new_options
 
+    desc 'Device options are initialized from options' 
     dvc.prove { attributes_match? new_options }
   end
 
-  proof 'Fails if attempting to push the same named device more than once' do
+  proof 'Fails if attempting to push multiple devices with the same options' do
     wrt = writer
     failed = false
+    name = :duplicated_name_for_fails_if_attempting_more_than_once
+    options = { :name => name }
 
-    dvc = wrt.push_device :string_io
+    dvc = wrt.push_device :string_io, options
     begin
-      second = wrt.push_device :string_io
+      second = wrt.push_device :string_io, options
     rescue
       failed = true
     end

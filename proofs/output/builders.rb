@@ -12,5 +12,11 @@ module OutputProofs
       def writer(type = :stdout, options={})
         Output::Writer.build 'first', :debug, nil, :debug, nil, device_options(:device => type).merge(options)
       end
+
+      def logger(name = 'some_name')
+        level = :info
+        logger = Output::Writer::BuildLogger::ClassMethods::build_logger(name, level, device_options)
+        logger
+      end
   end
 end

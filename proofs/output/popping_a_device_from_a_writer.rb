@@ -1,50 +1,35 @@
 require_relative '../proofs_init'
+require_relative 'builders'
+
+include OutputProofs
 
 title 'Popping An Device From A Writer'
 
-module Output
-  class Writer
-    module Proof
-      def device?(device)
-        devices.include?(device) &&
-          @logger.appenders.include?(device)
-      end
-      def logger_device?(device)
-        @logger.appenders.include?(device)
-      end
-    end
-  end
+def device
+  Builders.device
 end
 
-def new_device
-  Logging.appenders.string_io(:something)
-end
-
-def new_writer
-  logger = Logging::logger['Something']
-  logger.level = :debug
-  device_options ||= { :device => :stdout, :pattern => '%m\n' }
-
-  Output::Writer.new 'first',:debug, nil, logger, device_options
+def writer
+  Builders.writer
 end
 
 
-proof 'Removes it from the list of devices' do
-  device = new_device
-  writer = new_writer
-  writer.push_device device
+proof 'Removes it from the its pushed devices' do
+  dvc = device
+  wtr = writer
+  wtr.push_device dvc
 
-  writer.pop_device
+  wtr.pop_device
 
-  writer.prove { not device? device }
+  wtr.prove { not device? dvc }
 end
 
-proof 'Removes it from its logger' do
-  device = new_device
-  writer = new_writer
-  writer.push_device device
+proof "Removes it from its logger's devices" do
+  dvc = device
+  wtr = writer
+  wtr.push_device dvc
 
-  writer.pop_device
+  wtr.pop_device
 
-  writer.prove { not logger_device? device }
+  wtr.prove { not logger_device? dvc }
 end

@@ -36,7 +36,7 @@ proof 'Resets its level to its initial level' do
   otp.prove { initial_level? }
 end
 
-proof 'Resets all of its writers' do
+proof "Resets all of its writers to their initial level" do
   otp = output
 
   otp.each_writer do |writer|
