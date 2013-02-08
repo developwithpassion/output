@@ -17,7 +17,7 @@ def device_options
   { :device => :stdout, :name => :first, :pattern => '%m\n' }
 end
 
-def device(name)
+def device
   Output::Devices.build_device(:stdout, device_options) 
 end
 
@@ -28,7 +28,7 @@ end
 
 proof 'Remove the device from its loggers appenders' do
   wrt = writer
-  new_device =  device :some_name
+  new_device =  device
   wrt.add_device new_device
 
   wrt.remove_device new_device

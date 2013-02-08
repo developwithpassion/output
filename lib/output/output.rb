@@ -103,36 +103,35 @@ module Output
 
   def suspend_devices(device, &block)
     return suspend_devices__obj(device, &block) if device.is_a? Logging::Appender
-
     suspend_devices__name device, &block
+  end
+
+  def suspend_devices__obj(device, &block)
+    device_selector = ->(writer) { device }
+    suspend_devices__device_selector device_selector, &block
   end
 
 
   def suspend_devices__name(name, &block)
     device_selector = ->(writer) { writer.device name }
-
     suspend_devices__device_selector device_selector, &block
   end
 
   def suspend_devices__device_selector(device_selector, &block)
     suspensions = []
+
     each_writer do |writer|
       device = device_selector.call writer
       suspension = Writer::DeviceSuspension.new writer, device
       suspensions << suspension
       suspension.suspend
     end
+
     yield
-    suspensions.each do |suspension|
-      suspension.restore
-    end
+
+    suspensions.each { |suspension| suspension.restore }
   end
 
-  def suspend_devices__obj(device, &block)
-    device_selector = ->(writer) { device }
-
-    suspend_devices__device_selector device_selector, &block
-  end
 
   def push_device(device, options = {}, &block)
     return push_device__obj(device, &block) if device.is_a? Logging::Appender
@@ -142,7 +141,6 @@ module Output
 
   def push_device__opts(type, options = {}, &block)
     options = self.class.device_options.merge(options)
-
     dvc = Output::Devices.build_device(type, options)
     push_device__obj dvc, &block
   end

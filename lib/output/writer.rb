@@ -169,14 +169,9 @@ module Output
       remove_device device
     end
 
-    def dump_device_names
-      names = "Our device names are: \n"
-      devices.each do |dvc|
-        names = "#{names}\t#{dvc.name}:#{dvc.class}\n"
-      end
-      names
-    end
     def device?(device)
+      return false if device.nil?
+      
       devices.include?(device) || devices.any? { |dvc| dvc.name == device.name }
     end
 
