@@ -100,7 +100,7 @@ module Output
     suspensions = []
     each_writer do |writer|
       device = writer.device name
-      suspension = Writer::WriterSuspensionState.new writer, device
+      suspension = Writer::WriterDeviceSuspension.new writer, device
       suspensions << suspension
       writer.suspend_device name
     end

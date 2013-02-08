@@ -98,7 +98,7 @@ module Output
       suspend_device__obj dvc, &block
     end
 
-    class WriterSuspensionState
+    class WriterDeviceSuspension
       include Initializer
 
       attr_accessor :logger_device
@@ -123,7 +123,7 @@ module Output
     end
 
     def suspend_device__obj(device, &block)
-      suspension_state = WriterSuspensionState.new self, device
+      suspension_state = WriterDeviceSuspension.new self, device
       suspension_state.suspend
 
       if block_given?
