@@ -102,7 +102,7 @@ module Output
       device = writer.device name
       suspension = Writer::WriterDeviceSuspension.new writer, device
       suspensions << suspension
-      writer.suspend_device name
+      suspension.suspend
     end
     yield
     suspensions.each do |suspension_state|
@@ -111,12 +111,15 @@ module Output
   end
 
   def suspend_devices__obj(device, &block)
+    suspensions = []
     each_writer do |writer|
-      writer.suspend_device device
+      suspension = Writer::WriterDeviceSuspension.new writer, device
+      suspensions << suspension
+      suspension.suspend
     end
     yield
-    each_writer do |writer|
-      writer.push_device device
+    suspensions.each do |suspension|
+      suspension.restore
     end
     device
   end

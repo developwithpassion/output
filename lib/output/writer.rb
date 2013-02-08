@@ -114,8 +114,8 @@ module Output
       end
 
       def suspend
-        logger_device = writer.logger_device? device
-        writer_device = writer.device? device
+        self.logger_device = writer.logger_device? device
+        self.writer_device = writer.device? device
 
         writer.remove_device device if logger_device
         writer.devices.delete device if writer_device
@@ -123,12 +123,12 @@ module Output
     end
 
     def suspend_device__obj(device, &block)
-      suspension_state = WriterDeviceSuspension.new self, device
-      suspension_state.suspend
+      suspension = WriterDeviceSuspension.new self, device
+      suspension.suspend
 
       if block_given?
         yield
-        suspension_state.restore
+        suspension.restore
       end
       device
     end

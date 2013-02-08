@@ -95,7 +95,6 @@ heading 'By name' do
     opt.push_device dvc
 
     opt.suspend_devices :some_name do
-      opt.prove { true }
     end
 
     opt.prove { device? dvc }
