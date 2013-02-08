@@ -95,12 +95,31 @@ module Output
     suspend_devices__name device, &block
   end
 
-  def suspend_devices__name(name, &block)
-    device = nil
-    each_writer do |writer|
-      device ||= writer.device name
+  class WriterSuspensionState
+    include Initializer
+
+    initializer :writer, :device, :logger_device, :writer_device
+
+    def restore
+      unless device.nil?
+        writer.push_device device if (writer_device)
+        writer.add_device device if (logger_device)
+      end
     end
-    suspend_devices__obj device, &block unless device == nil
+  end
+
+  def suspend_devices__name(name, &block)
+    suspensions = []
+    each_writer do |writer|
+      device = writer.device name
+      suspension = WriterSuspensionState.new(writer, device, writer.logger_device?(device), writer.device?(device))
+      suspensions << suspension
+      writer.suspend_device name
+    end
+    yield
+    suspensions.each do |suspension_state|
+      suspension_state.restore
+    end
   end
 
   def suspend_devices__obj(device, &block)

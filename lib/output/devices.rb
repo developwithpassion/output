@@ -7,8 +7,8 @@ module Output
         :file => Builder::File,
       }
 
-      defaults = { :name => type, :pattern => DEFAULT_PATTERN }
-      options = defaults.merge(options)
+      default_options = { :name => type, :pattern => DEFAULT_PATTERN }
+      options = default_options.merge(options)
       name = options[:name]
 
       builder = builders[type]

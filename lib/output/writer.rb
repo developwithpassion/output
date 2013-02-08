@@ -72,6 +72,12 @@ module Output
       result
     end
 
+    def logger_device?(device)
+      logger.appenders.include? device
+    end
+
+
+
     def remove_device(device)
       @logger.remove_appenders device
       device
@@ -93,12 +99,18 @@ module Output
     end
 
     def suspend_device__obj(device, &block)
-      remove_device device
-      devices.delete device
+      requires_push_back = device?(device)
+      logger_device = logger_device?(device)
+
+      if requires_push_back || logger_device
+        remove_device device
+        devices.delete device
+      end
 
       if block_given?
         yield
-        push_device__obj device
+        push_device__obj device if requires_push_back
+        add_device device if logger_device
       end
       device
     end

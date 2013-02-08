@@ -57,11 +57,9 @@ heading 'By instance' do
   proof 'Adds the device back onto the devices list after the block has run' do
     wrt = writer
     new_device =  device :some_name
-    wrt.add_device new_device
-    ran = false
+    wrt.push_device new_device
 
     wrt.suspend_device new_device do
-      ran = true
     end
 
     wrt.prove { device? new_device }
@@ -94,12 +92,80 @@ heading 'By name' do
     wrt = writer
     new_device =  device :some_name
     wrt.push_device new_device
-    ran = false
 
     wrt.suspend_device :some_name do
-      ran = true
     end
 
     wrt.prove { device? new_device }
+  end
+end
+heading 'When the device is one of the writers loggers devices but not one of the writers pushed devices' do
+  proof 'Removes the device from the logger' do
+    wrt = writer
+    new_device =  device :some_name
+    wrt.add_device new_device
+
+    wrt.suspend_device :some_name do
+      wrt.prove { not logger_device? new_device }
+    end
+  end
+  proof 'Runs the block' do
+    wrt = writer
+    new_device =  device :some_name
+    wrt.add_device new_device
+
+    wrt.suspend_device :some_name do
+      wrt.prove { true }
+    end
+  end
+
+  proof 'Adds it back to the loggers devices after running the block' do
+    wrt = writer
+    new_device =  device :some_name
+    wrt.add_device new_device
+
+    wrt.suspend_device :some_name do
+    end
+
+    wrt.prove { logger_device? new_device }
+  end
+
+  proof 'Does not push it onto the list of writer devices' do
+    wrt = writer
+    new_device =  device :some_name
+    wrt.add_device new_device
+
+    wrt.suspend_device :some_name do
+    end
+
+    wrt.prove { not device? new_device }
+  end
+end
+heading 'When the device is neither a device of the writer or its logger' do
+  proof 'Runs the block' do
+    wrt = writer
+    new_device =  device :some_name
+
+    wrt.suspend_device :some_name do
+      wrt.prove { true }
+    end
+  end
+  proof 'Does not add the device to the writers list of devices' do
+    wrt = writer
+    new_device =  device :some_name
+
+    wrt.suspend_device :some_name do
+    end
+
+    wrt.prove { not device? new_device }
+  end
+  proof 'Does not add the device to the loggers list of devices' do
+    wrt = writer
+    new_device =  device :some_name
+
+    wrt.suspend_device :some_name do
+    end
+
+    wrt.prove { not logger_device? new_device }
   end
 end
