@@ -142,6 +142,8 @@ module Output
   end
 
   def push_device(device, options = {}, &block)
+    return device if device.nil?
+
     return push_device__obj(device, &block) if device.is_a? Logging::Appender
 
     push_device__opts(type = device, options, &block)

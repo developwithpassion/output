@@ -37,4 +37,6 @@ proof do
 
   desc 'Includes the level'
   result.prove { include? otp.level.to_s }
+
+  puts result
 end

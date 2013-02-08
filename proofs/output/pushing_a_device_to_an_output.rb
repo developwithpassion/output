@@ -20,9 +20,14 @@ module PushingADeviceToOutputProofs
           second_writer.device?(device)
       end
 
+      def device_count?(count)
+        first_writer.number_of_stack_devices == count 
+          second_writer.number_of_stack_devices == count
+      end
     end
   end
 end
+
 
 
 def device
@@ -32,6 +37,7 @@ end
 def output
   PushingADeviceToOutputProofs::Example.new
 end
+
 
 heading 'Pushing a device' do
   proof 'Pushes it to all of its writers' do
@@ -52,6 +58,19 @@ heading 'Pushing a device' do
     rescue
       opt.prove { true }
     end
+  end
+end
+
+heading 'Attempting to push a nil device with a block' do
+  proof  do
+    dvc = device
+    opt = output
+
+    opt.push_device dvc do
+      desc 'Does not change the writers pushed devices'
+      opt.prove { device_count? 0 }
+    end
+
   end
 end
 
