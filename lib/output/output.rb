@@ -132,6 +132,7 @@ module Output
     options = self.class.device_options.merge(options)
 
     dvc = Output::Devices.build_device(type, options)
+    puts dvc
     push_device__obj dvc, &block
   end
 

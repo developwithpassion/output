@@ -159,7 +159,7 @@ heading 'Pushing an device using options' do
     rescue
       failed = true
     end
-    failed.prove { self == true }
+    failed.prove { failed }
   end
 end
 

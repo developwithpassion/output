@@ -38,6 +38,18 @@ heading 'Pushing a device' do
     opt.push_device dvc
     opt.prove { device? dvc }
   end
+
+  proof 'Fails to push the same device multiple times' do
+    opt = output
+
+    opt.push_device :string_io
+    begin
+      opt.push_device :string_io
+      opt.prove { false }
+    rescue
+      opt.prove { true }
+    end
+  end
 end
 
 

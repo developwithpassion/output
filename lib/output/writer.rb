@@ -134,7 +134,7 @@ module Output
     end
 
     def push_device__obj(device, &block)
-      raise "The device #{device.name} has already been pushed" if devices.include?(device)
+      raise "The device #{device.name} has already been pushed" if device?(device)
 
       devices.push device
 
@@ -170,7 +170,7 @@ module Output
     end
 
     def device?(device)
-      devices.include?(device)
+      devices.include?(device) || devices.any? { |dvc| dvc.name == device.name }
     end
 
     class Attribute
