@@ -18,15 +18,15 @@ heading 'Suspending a device that is one of the writers pushed devices' do
     susp = suspension(wrt, dvc)
     susp.suspend
 
-    desc 'Removes the device from the writers loggers devices'
+    desc "Removes the device from the writer's logger's devices"
     wrt.prove { not logger_device? dvc }
 
-    desc 'Removes the device from the writers list of pushed devices'
+    desc "Removes the device from the writer's pushed devices"
     wrt.prove { not device? dvc }
   end
 end
 
-heading "Suspending a device that is only a device of the writer's logger" do
+heading "Suspending a device that is only a writer's logger's device" do
   proof do
     wrt = Builders.writer
     dvc = Builders.device
@@ -35,13 +35,13 @@ heading "Suspending a device that is only a device of the writer's logger" do
     susp = suspension(wrt, dvc)
     susp.suspend
 
-    desc 'Removes the device from the writers loggers devices'
+    desc "Removes the device from the writer's logger's devices"
     wrt.prove { not logger_device? dvc }
 
   end
 end
 
-heading "Suspending a device that not in the writer list of devices or its loggers devices" do
+heading "Suspending a device that not in the writer's pushed devices or its logger's devices" do
   proof do
     wrt = Builders.writer
     dvc = Builders.device
@@ -93,10 +93,10 @@ heading "Restoring a device that was one of the writers pushed devices" do
     
     susp.restore
 
-    desc "Adds the device back onto the list of the writer's devices"
+    desc "Adds the device back onto the writer's pushed devices"
     wrt.prove { device? dvc }
 
-    desc "Adds the device back onto the writer's loggers devices"
+    desc "Adds the device back onto the writer's logger's devices"
     wrt.prove { logger_device? dvc }
   end
 end
@@ -112,7 +112,7 @@ heading "Restoring a device that was only one of the writer's logger's devices" 
     
     susp.restore
 
-    desc "Does not adds the device back onto the list of the writer's devices"
+    desc "Does not adds the device back onto writer's pushed devices"
     wrt.prove { not device? dvc }
 
     desc "Adds the device back onto the writer's logger's devices"
@@ -120,7 +120,7 @@ heading "Restoring a device that was only one of the writer's logger's devices" 
   end
 end
 
-heading "Restoring a device that was neiter one of the writer's or it's logger's devices" do
+heading "Restoring a device that was neiter one of the writer's pushed devices or one of it's logger's devices" do
   proof do
     wrt = Builders.writer
     dvc = Builders.device
@@ -130,7 +130,7 @@ heading "Restoring a device that was neiter one of the writer's or it's logger's
     
     susp.restore
 
-    desc "Does not adds the device onto the list of the writer's devices"
+    desc "Does not add the device onto the writer's pushed devices"
     wrt.prove { not device? dvc }
 
     desc "Does not add the device to the writer's logger's devices"
