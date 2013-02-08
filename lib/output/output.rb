@@ -32,7 +32,7 @@ module Output
 
   def build_writer(name, level, device_options = nil, message_transformer=nil)
     device_options ||= {}
-    device_options = self.class.build_device_options device_options
+    device_options = self.class.device_options.merge device_options
     logger_name = Writer::Naming.fully_qualified(self.class, name)
     writer = Writer.build name, level, message_transformer, self.level, logger_name, device_options
     writer
@@ -121,7 +121,7 @@ module Output
   end
 
   def push_device__opts(device, options = {}, &block)
-    options = self.class.build_device_options.merge(options)
+    options = self.class.device_options.merge(options)
 
     dvc = Output::Devices.build_device(device, options)
     push_device__obj dvc, &block
@@ -177,19 +177,18 @@ module Output
       @writer_names ||= []
     end
 
-    def build_device_options(options = {})
+    def device_options
       device_options = {}
-      device_options[:device] = options[:device] || default_device_type
-      device_options[:pattern] = options[:pattern] || default_pattern
-      device_options = device_options.merge(options)
+      device_options[:device] = default_device_type
+      device_options[:pattern] = default_pattern
       device_options
     end
 
     def writer_macro(name, options = {}, &message_transformer)
       level = options[:level] || logger_level
-      device_options = build_device_options(options)
+      options = device_options.merge(options)
 
-      WriterMacro.define_writer self, name, level, device_options,  message_transformer
+      WriterMacro.define_writer self, name, level, options,  message_transformer
       writer_names << name
     end
 
