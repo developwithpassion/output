@@ -13,7 +13,7 @@ module Output
         def build_logger(name, level, device_options)
           logger = Logging.logger[name]
           logger.level = level
-          logger.appenders = Output::Devices.build_device(name, device_options)
+          logger.appenders = Output::Devices.build_device(device_options[:device], device_options)
           logger.extend LevelName
           logger
         end

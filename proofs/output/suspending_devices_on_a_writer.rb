@@ -16,12 +16,12 @@ module Output
   end
 end
 
-def device_options
-  { :device => :stdout, :pattern => '%m\n' }
+def device_options(name)
+  { :name => name, :device => :stdout, :pattern => '%m\n' }
 end
 
 def device(name)
-  Output::Devices.build_device(name, device_options) 
+  Output::Devices.build_device(:stdout, device_options(name)) 
 end
 
 def builder
@@ -29,10 +29,7 @@ def builder
 end
 
 def writer
-  device_options = { :device => :stdout, :pattern => '%m\n' }
-  logger = builder.build_logger 'some name', :debug, device_options
-
-  Output::Writer.new 'some name', :debug, nil, logger, device_options
+  Output::Writer.build 'some name', :debug, nil, :debug, nil, device_options(:some_name)
 end
 
 heading 'By instance' do

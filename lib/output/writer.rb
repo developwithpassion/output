@@ -65,9 +65,11 @@ module Output
     end
 
     def device(name)
-      devices.select do |device|
-        device.name == name.to_s
-      end.first
+      result = nil
+      logger.appenders.each do|device|
+        result = device if device.name == name.to_s
+      end
+      result
     end
 
     def remove_device(device)
@@ -118,15 +120,16 @@ module Output
     def push_device(device, options = {},  &block)
       return push_device__obj(device, &block) if device.is_a? Logging::Appender
 
-      push_device__opts(device, options, &block)
+      push_device__opts(type = device, options, &block)
     end
 
-    def push_device__opts(name, options = {}, &block)
+    def push_device__opts(type, options = {}, &block)
       options = self.device_options.merge(options)
+      name = options[:name] || type
 
       raise "The device #{name} has already been pushed" unless device(name).nil?
 
-      device = Output::Devices.build_device(name, options)
+      device = Output::Devices.build_device(type, options)
       push_device__obj device, &block
     end
 

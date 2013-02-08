@@ -23,7 +23,7 @@ end
 
 
 def device
-  Output::Devices.build_device(:some_name, :device => :stdout, :pattern => '%m\n') 
+  Output::Devices.build_device(:string_io, :name => :some_name, :pattern => '%m\n') 
 end
 
 def output

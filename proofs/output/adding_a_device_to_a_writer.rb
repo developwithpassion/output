@@ -18,23 +18,22 @@ module Output
 end
 
 def device_options
-  { :device => :stdout, :pattern => '%m\n' }
+  { :device => :stdout, :name => :stdout, :pattern => '%m\n' }
 end
 
-def device(name)
-  Output::Devices.build_device(name, device_options) 
+def device
+  Output::Devices.build_device(:stdout, device_options)
 end
 
 def writer
-  logger = Output::Writer::BuildLogger::ClassMethods.build_logger :some_name, :info, device_options
-  Output::Writer.new 'first',:debug, nil, logger, device_options
+  Output::Writer.build 'first',:debug, nil, :debug, nil, device_options
 end
 
 heading 'Adding a device' do
 
   proof 'Adds the device to its loggers appenders' do
     wrt = writer
-    new_device =  device :some_name
+    new_device =  device
 
     wrt.add_device new_device
 

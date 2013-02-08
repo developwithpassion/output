@@ -22,7 +22,7 @@ module SuspendingDevicesOnOutput
 end
 
 def device
-  Output::Devices.build_device(:some_name, :device => :stdout, :pattern => '%m\n') 
+  Output::Devices.build_device(:stdout, :name => :some_name, :pattern => '%m\n') 
 end
 
 def output
@@ -36,7 +36,7 @@ heading 'By instance' do
 
     opt.push_device dvc
 
-    opt.suspend_device dvc do
+    opt.suspend_devices dvc do
       opt.prove { not device? dvc }
     end
   end
@@ -47,7 +47,7 @@ heading 'By instance' do
 
     opt.push_device dvc
 
-    opt.suspend_device dvc do
+    opt.suspend_devices dvc do
       opt.prove { true }
     end
   end
@@ -58,7 +58,7 @@ heading 'By instance' do
 
     opt.push_device dvc
 
-    opt.suspend_device dvc do
+    opt.suspend_devices dvc do
       opt.prove { true }
     end
 
@@ -72,7 +72,7 @@ heading 'By name' do
 
     opt.push_device dvc
 
-    opt.suspend_device :some_name do
+    opt.suspend_devices :some_name do
       opt.prove { not device? dvc }
     end
   end
@@ -83,7 +83,7 @@ heading 'By name' do
 
     opt.push_device dvc
 
-    opt.suspend_device :some_name do
+    opt.suspend_devices :some_name do
       opt.prove { true }
     end
   end
@@ -94,7 +94,7 @@ heading 'By name' do
 
     opt.push_device dvc
 
-    opt.suspend_device :some_name do
+    opt.suspend_devices :some_name do
       opt.prove { true }
     end
 

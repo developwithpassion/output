@@ -1,16 +1,17 @@
 module Output
   module Devices
-    def self.build_device(name, options = {})
+    def self.build_device(type, options = {})
       builders = { 
         :stdout => Builder::Stdout,
         :string_io => Builder::StringIo,
         :file => Builder::File,
       }
 
-      defaults = { :device => :string_io , :pattern => DEFAULT_PATTERN }
+      defaults = { :name => type, :pattern => DEFAULT_PATTERN }
       options = defaults.merge(options)
+      name = options[:name]
 
-      builder = builders[options[:device]]
+      builder = builders[type]
       builder.build(name, options)
     end
 

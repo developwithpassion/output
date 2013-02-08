@@ -89,21 +89,21 @@ module Output
     level
   end
 
-  def suspend_device(device, &block)
-    return suspend_device__obj(device, &block) if device.is_a? Logging::Appender
+  def suspend_devices(device, &block)
+    return suspend_devices__obj(device, &block) if device.is_a? Logging::Appender
 
-    suspend_device__name device, &block
+    suspend_devices__name device, &block
   end
 
-  def suspend_device__name(name, &block)
+  def suspend_devices__name(name, &block)
     device = nil
     each_writer do |writer|
       device ||= writer.device name
     end
-    suspend_device__obj device, &block unless device == nil
+    suspend_devices__obj device, &block unless device == nil
   end
 
-  def suspend_device__obj(device, &block)
+  def suspend_devices__obj(device, &block)
     each_writer do |writer|
       writer.suspend_device device
     end
@@ -180,6 +180,7 @@ module Output
     def device_options
       device_options = {}
       device_options[:device] = default_device_type
+      device_options[:name] = default_device_type
       device_options[:pattern] = default_pattern
       device_options
     end

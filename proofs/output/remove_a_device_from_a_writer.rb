@@ -14,16 +14,15 @@ module Output
 end
 
 def device_options
-  { :device => :stdout, :pattern => '%m\n' }
+  { :device => :stdout, :name => :first, :pattern => '%m\n' }
 end
 
 def device(name)
-  Output::Devices.build_device(name, device_options) 
+  Output::Devices.build_device(:stdout, device_options) 
 end
 
 def writer
-  logger = Output::Writer::BuildLogger::ClassMethods.build_logger :some_name, :info, device_options
-  Output::Writer.new 'first',:debug, nil, logger, device_options
+  Output::Writer.build 'first', :debug, nil, :debug, nil, device_options
 end
 
 
