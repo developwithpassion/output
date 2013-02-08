@@ -118,7 +118,7 @@ module Output
     suspensions = []
     each_writer do |writer|
       device = device_selector.call writer
-      suspension = Writer::WriterDeviceSuspension.new writer, device
+      suspension = Writer::DeviceSuspension.new writer, device
       suspensions << suspension
       suspension.suspend
     end
@@ -200,7 +200,6 @@ module Output
     def device_options
       device_options = {}
       device_options[:device] = default_device_type
-      device_options[:name] = default_device_type
       device_options[:pattern] = default_pattern
       device_options
     end

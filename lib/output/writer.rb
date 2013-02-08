@@ -98,7 +98,7 @@ module Output
       suspend_device__obj dvc, &block
     end
 
-    class WriterDeviceSuspension
+    class DeviceSuspension
       include Initializer
 
       attr_accessor :logger_device
@@ -123,7 +123,7 @@ module Output
     end
 
     def suspend_device__obj(device, &block)
-      suspension = WriterDeviceSuspension.new self, device
+      suspension = DeviceSuspension.new self, device
       suspension.suspend
 
       if block_given?
@@ -134,7 +134,7 @@ module Output
     end
 
     def push_device__obj(device, &block)
-      raise "The device #{device.name} has already been pushed" if device?(device)
+      raise "The writer:[#{self.name}] already has a device named #{device.name}:[#{device.class}]" if device?(device)
 
       devices.push device
 
@@ -169,6 +169,13 @@ module Output
       remove_device device
     end
 
+    def dump_device_names
+      names = "Our device names are: \n"
+      devices.each do |dvc|
+        names = "#{names}\t#{dvc.name}:#{dvc.class}\n"
+      end
+      names
+    end
     def device?(device)
       devices.include?(device) || devices.any? { |dvc| dvc.name == device.name }
     end
