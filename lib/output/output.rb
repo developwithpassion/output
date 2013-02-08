@@ -131,6 +131,15 @@ module Output
     suspensions.each { |suspension| suspension.restore }
   end
 
+  def to_s
+    details = "Output : #{self.class.name} - Object Id:#{self.object_id}\n"
+    details << "Level: #{self.level}\n"
+    details << "Writer Details: \n"
+    each_writer do |writer|
+      details << "#{writer.to_s}\n"
+    end
+    details
+  end
 
   def push_device(device, options = {}, &block)
     return push_device__obj(device, &block) if device.is_a? Logging::Appender
@@ -200,6 +209,7 @@ module Output
       device_options[:pattern] = default_pattern
       device_options
     end
+
 
     def writer_macro(name, options = {}, &message_transformer)
       level = options[:level] || logger_level

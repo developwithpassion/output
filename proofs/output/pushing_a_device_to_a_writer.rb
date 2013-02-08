@@ -81,19 +81,16 @@ heading 'Pushing an device using default options' do
   proof do
     wrt = writer
 
-    dvc = wrt.push_device :string_io, :name => :pushing_with_options
+    dvc = wrt.push_device :string_io, :name => :pushing_with_options do
+      desc 'Block is run'
+      wrt.prove { true }
+    end
 
-    desc 'Device is added to its pushed devices'
-    wrt.prove { device? dvc }
+    desc 'Device is removed from its pushed devices after running the block'
+    wrt.prove { !device? dvc }
 
-    desc "Device is added to its logger's devices"
-    wrt.prove { logger_device? dvc }
-
-    desc "Device options are set from writers device options"
-    dvc.prove { attributes_match? wrt.device_options }
-
-    desc 'Device is the requested device type'
-    dvc.prove { self.class == Logging::Appenders::StringIo }
+    desc 'Device is removed from its loggers devices after running the block'
+    wrt.prove { !logger_device? dvc }
   end
 end
 

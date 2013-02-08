@@ -113,6 +113,7 @@ module Output
         end
       end
 
+
       def suspend
         self.logger_device = writer.logger_device? device
         self.writer_device = writer.device? device
@@ -173,6 +174,20 @@ module Output
       return false if device.nil?
       
       devices.include?(device) || devices.any? { |dvc| dvc.name == device.name }
+    end
+
+    def to_s
+      details = "Writer : #{self.name}\n"
+      details << "\tLevel : #{self.level}\n"
+      details << "\tDevice Stack : \n"
+      devices.each do |device|
+        details << "\t\tDevice : #{device.name} - #{device.class}\n"
+      end
+      details << "\tLogger Appenders : \n"
+      logger.appenders.each do |appender|
+        details << "\t\t\Appender : #{appender.name} - #{appender.class}\n"
+      end
+      details
     end
 
     class Attribute
