@@ -97,22 +97,15 @@ module Output
 
 
   def suspend_devices__name(name, &block)
-    suspensions = []
-    each_writer do |writer|
-      device = writer.device name
-      suspension = Writer::WriterDeviceSuspension.new writer, device
-      suspensions << suspension
-      suspension.suspend
-    end
-    yield
-    suspensions.each do |suspension_state|
-      suspension_state.restore
-    end
+    device_selector = ->(writer) { writer.device name }
+
+    suspend_devices__device_selector device_selector, &block
   end
 
-  def suspend_devices__obj(device, &block)
+  def suspend_devices__device_selector(device_selector, &block)
     suspensions = []
     each_writer do |writer|
+      device = device_selector.call writer
       suspension = Writer::WriterDeviceSuspension.new writer, device
       suspensions << suspension
       suspension.suspend
@@ -121,7 +114,12 @@ module Output
     suspensions.each do |suspension|
       suspension.restore
     end
-    device
+  end
+
+  def suspend_devices__obj(device, &block)
+    device_selector = ->(writer) { device }
+
+    suspend_devices__device_selector device_selector, &block
   end
 
   def push_device(device, options = {}, &block)
