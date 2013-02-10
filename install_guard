@@ -1,0 +1,6 @@
+#!/bin/bash
+
+gem install guard
+gem install guard-shell
+gem install rb-fsevent
+
