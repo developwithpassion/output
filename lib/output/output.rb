@@ -151,8 +151,8 @@ module Output
 
   def push_device__opts(type, options = {}, &block)
     options = self.class.device_options.merge(options)
-    dvc = Output::Devices.build_device(type, options)
-    push_device__obj dvc, &block
+    device = Output::Devices.build_device(type, options)
+    push_device__obj device, &block
   end
 
   def push_device__obj(device, &block)
@@ -171,6 +171,14 @@ module Output
       writer.pop_device
     end
     nil
+  end
+
+
+  def add_device(device)
+    each_writer do |writer|
+      writer.add_device device
+    end
+    device
   end
 
   module ClassMethods

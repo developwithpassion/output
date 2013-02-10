@@ -1,5 +1,5 @@
 require_relative '../proofs_init'
-require_relative 'builders'
+require_relative '../example/builders'
 
 include OutputProofs
 
