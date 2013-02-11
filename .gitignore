@@ -23,3 +23,5 @@ doc/
 
 .rvmrc
 Gemfile.lock
+
+some_log.txt

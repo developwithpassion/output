@@ -1,3 +1,9 @@
+#!/usr/bin/env ruby
+
 require_relative 'proofs_init'
 
-Proof::Suite.run "output/**/*.rb"
+include Proof
+
+result = Proof::Suite.run "output/**/*.rb"
+
+exit result == :success
