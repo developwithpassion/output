@@ -5,7 +5,7 @@ $:.unshift lib unless $:.include?(lib)
 Gem::Specification.new do |s|
   s.name = 'output'
   s.summary = 'Output Library'
-  s.version = '0.0.1'
+  s.version = '0.0.2'
   s.authors = ['The Sans Collective']
   s.homepage = 'https://github.com/Sans/output'
   s.platform = Gem::Platform::RUBY
