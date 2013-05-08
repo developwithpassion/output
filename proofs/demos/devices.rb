@@ -21,6 +21,7 @@ module DevicesDemo
     # some_log.txt
     writer :file, :level => :info, :filename => 'some_log.txt'
 
+    # Define a writer that writes to stderr
     writer :error, :level => :info, :device => :stderr
   end
 end
@@ -38,7 +39,7 @@ otp.file 'Hello File'
 otp.file 'Hello again File'
 otp.error 'An error message'
 
-# Temporarily push a new string_io device to a writer
+# Temporarily push a new string_io device to a writer, which will cause all writing to the writer to go to both devices
 device = otp.file_writer.push_device(:string_io) do
   otp.file 'This should go to both devices'
 end
