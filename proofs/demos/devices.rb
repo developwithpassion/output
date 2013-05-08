@@ -13,7 +13,7 @@ module DevicesDemo
 
     # Define a writer that writes to string_io
     writer :string_io, :level => :info, :device => :string_io
-    #
+
     # Define a writer that writes to stdout
     writer :stdout, :level => :info, :device => :stdout
     
