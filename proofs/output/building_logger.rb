@@ -5,8 +5,6 @@ include OutputProofs
 
 title 'Building a Logger'
 
-
-
 module Logging
   class Logger
     module Proof

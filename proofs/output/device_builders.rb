@@ -8,7 +8,6 @@ module DeviceBuildersProofs
 
     device :stdout
     required_options :pattern, :filename
-
   end
 end
 

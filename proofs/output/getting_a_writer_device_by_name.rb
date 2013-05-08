@@ -4,7 +4,6 @@ require_relative '../example/builders'
 include OutputProofs
 
 title 'Getting a writer device by name'
-   
 
 def writer
   Builders.writer

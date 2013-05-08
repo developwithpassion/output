@@ -13,7 +13,6 @@ def writer
   Builders.writer
 end
 
-
 proof 'Removes it from the its pushed devices' do
   dvc = device
   wtr = writer

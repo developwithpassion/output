@@ -3,10 +3,7 @@ require_relative '../example/builders'
 
 include OutputProofs
 
-
 title 'Displaying Writer Details'
-
-
 
 def writer
   Builders.writer

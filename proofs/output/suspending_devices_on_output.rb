@@ -16,7 +16,6 @@ module SuspendingDevicesOnOutput
         first_writer.device?(device) &&
           second_writer.device?(device)
       end
-
     end
   end
 end

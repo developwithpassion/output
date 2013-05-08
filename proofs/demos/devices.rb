@@ -1,6 +1,5 @@
 require_relative '../proofs_init'
 
-
 module DevicesDemo
   class Output
     include Single
@@ -22,7 +21,6 @@ module DevicesDemo
     writer :file, :level => :info, :filename => 'some_log.txt'
   end
 end
-
 
 def output
   DevicesDemo::Output.new

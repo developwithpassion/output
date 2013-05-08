@@ -11,11 +11,9 @@ module Output
       def logger_device?(device)
         @logger.appenders.include?(device)
       end
-
     end
   end
 end
-
 
 def device
   Builders.device
@@ -24,7 +22,6 @@ end
 def writer
   Builders.writer
 end
-
 
 proof "Remove the device from its logger's devices" do
   wrt = writer

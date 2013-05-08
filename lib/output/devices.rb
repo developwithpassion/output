@@ -20,7 +20,6 @@ module Output
         Logging.layouts.pattern(:pattern => pattern)
       end
 
-
       def build(name, options)
         pattern = options[:pattern]
         layout = self.layout(pattern)

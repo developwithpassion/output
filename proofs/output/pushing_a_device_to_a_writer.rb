@@ -17,7 +17,6 @@ module Output
         @logger.appenders.include?(device) &&
           @logger.appenders.select{|item| item == device}.count == occurences
       end
-
     end
   end
 end

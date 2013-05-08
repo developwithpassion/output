@@ -110,7 +110,6 @@ module Output
     suspend_devices__device_selector device_selector, &block
   end
 
-
   def suspend_devices__name(name, &block)
     device_selector = ->(writer) { writer.device name }
     suspend_devices__device_selector device_selector, &block
@@ -173,7 +172,6 @@ module Output
     nil
   end
 
-
   def add_device(device)
     each_writer do |writer|
       writer.add_device device
@@ -220,7 +218,6 @@ module Output
       device_options
     end
 
-
     def writer_macro(name, options = {}, &message_transformer)
       level = options[:level] || logger_level
       options = device_options.merge(options)
@@ -234,6 +231,5 @@ module Output
     def writer_attribute(name)
       Writer::Attribute.attribute_name(name)
     end
-
   end
 end

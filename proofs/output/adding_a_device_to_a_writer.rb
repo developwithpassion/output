@@ -15,7 +15,6 @@ module Output
       def logger_device?(device)
         @logger.appenders.include?(device)
       end
-
     end
   end
 end

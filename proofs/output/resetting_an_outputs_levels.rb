@@ -22,7 +22,6 @@ module ResettingAnOutputsLevelProofs
   end
 end
 
-
 def output
   ResettingAnOutputsLevelProofs::Example.new
 end

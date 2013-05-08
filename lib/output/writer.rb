@@ -80,8 +80,6 @@ module Output
       logger.appenders.include? device
     end
 
-
-
     def remove_device(device)
       @logger.remove_appenders device
       device

@@ -28,8 +28,6 @@ module PushingADeviceToOutputProofs
   end
 end
 
-
-
 def device
   Builders.device
 end
@@ -37,7 +35,6 @@ end
 def output
   PushingADeviceToOutputProofs::Example.new
 end
-
 
 heading 'Pushing a device' do
   proof 'Pushes it to all of its writers' do
@@ -70,10 +67,8 @@ heading 'Attempting to push a nil device with a block' do
 
     desc 'Does not change the writers pushed devices'
     opt.prove { device_count? 0 }
-
   end
 end
-
 
 heading 'Pushing a device with a block' do
   proof  do
@@ -114,6 +109,5 @@ heading 'Pushing a device using options' do
     end
 
     opt.prove { not device? dvc }
-
   end
 end
