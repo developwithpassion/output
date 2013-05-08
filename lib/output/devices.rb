@@ -4,7 +4,8 @@ module Output
       builders = { 
         :stdout => Builder::Stdout,
         :string_io => Builder::StringIo,
-        :file => Builder::File
+        :file => Builder::File,
+        :stderr => Builder::Stderr
       }
 
       default_options = { :name => type, :pattern => DEFAULT_PATTERN }
@@ -78,6 +79,13 @@ module Output
         include Builder
 
         device :stdout
+        required_options :pattern
+      end
+
+      class Stderr
+        include Builder
+
+        device :stderr
         required_options :pattern
       end
     end

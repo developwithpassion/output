@@ -19,6 +19,8 @@ module DevicesDemo
     # Define a writer that writes to a rolling file named
     # some_log.txt
     writer :file, :level => :info, :filename => 'some_log.txt'
+
+    writer :error, :level => :info, :device => :stderr
   end
 end
 
@@ -33,6 +35,7 @@ otp.string_io 'Hello String IO'
 otp.stdout 'Hello Std Out'
 otp.file 'Hello File'
 otp.file 'Hello again File'
+otp.error 'An error message'
 
 # Temporarily push a new string_io device to a writer
 device = otp.file_writer.push_device(:string_io) do
