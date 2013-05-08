@@ -19,7 +19,7 @@ module DevicesDemo
     
     # Define a writer that writes to a rolling file named
     # some_log.txt
-    writer :file, :level => :info, :filename => 'some_log.txt'
+    writer :file, :level => :info, :filename => 'some_log.log'
 
     # Define a writer that writes to stderr
     writer :error, :level => :info, :device => :stderr
@@ -45,4 +45,4 @@ device = otp.file_writer.push_device(:string_io) do
 end
 puts device.read
 
-
+File.delete('some_log.log') if File.exist?('some_log.log')

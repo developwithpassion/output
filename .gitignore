@@ -25,5 +25,3 @@ doc/
 .ruby-gemset
 .ruby-version
 Gemfile.lock
-
-some_log.txt
