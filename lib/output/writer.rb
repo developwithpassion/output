@@ -136,6 +136,13 @@ module Output
       device
     end
 
+    def push_device(device, options = {},  &block)
+      return device if device.nil?
+      return push_device__obj(device, &block) if device.is_a? Logging::Appender
+
+      push_device__opts(type = device, options, &block)
+    end
+
     def push_device__obj(device, &block)
       raise "The writer:[#{self.name}] already has a device named #{device.name}:[#{device.class}]" if device?(device)
 
@@ -148,13 +155,6 @@ module Output
         pop_device
       end
       device
-    end
-
-    def push_device(device, options = {},  &block)
-      return device if device.nil?
-      return push_device__obj(device, &block) if device.is_a? Logging::Appender
-
-      push_device__opts(type = device, options, &block)
     end
 
     def push_device__opts(type, options = {}, &block)

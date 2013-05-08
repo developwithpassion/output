@@ -4,7 +4,7 @@ module Output
       builders = { 
         :stdout => Builder::Stdout,
         :string_io => Builder::StringIo,
-        :file => Builder::File,
+        :file => Builder::File
       }
 
       default_options = { :name => type, :pattern => DEFAULT_PATTERN }

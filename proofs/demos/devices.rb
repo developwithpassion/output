@@ -35,7 +35,7 @@ otp.file 'Hello File'
 otp.file 'Hello again File'
 
 # Temporarily push a new string_io device to a writer
-device = otp.file_writer.push_device_from_opts(:string_io) do
+device = otp.file_writer.push_device(:string_io) do
   otp.file 'This should go to both devices'
 end
 puts device.read
