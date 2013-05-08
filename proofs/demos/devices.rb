@@ -1,5 +1,6 @@
 require_relative '../proofs_init'
 
+title 'Demo - Writers with different devices'
 module DevicesDemo
   class Output
     include Single
