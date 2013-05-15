@@ -30,7 +30,7 @@ module Output
       end
 
       def self.included(base)
-        base.extend ClassMethods
+        Extension.! base, ClassMethods
       end
 
       module ClassMethods
@@ -53,7 +53,7 @@ module Output
         end
 
         def build(name, options)
-          options.extend Output::Devices::OptionValidation
+          Extension.! options, Output::Devices::OptionValidation
           options.validate!(device_id, all_required_options)
 
           instance = new 

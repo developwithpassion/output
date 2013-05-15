@@ -6,7 +6,7 @@ module Output
   DEFAULT_DEVICE = :stdout
 
   def self.included(base)
-    base.extend ClassMethods
+    Extension.! base, ClassMethods
   end
 
   def disable

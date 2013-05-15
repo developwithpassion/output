@@ -1,7 +1,8 @@
+require 'extension'
+require 'initializer'
 require 'logging'
 require 'setter'
 require 'single'
-require 'initializer'
 
 require 'output/devices'
 require 'output/writer_macro'

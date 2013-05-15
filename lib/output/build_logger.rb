@@ -4,7 +4,7 @@ module Output
       extend self
 
       def self.included(base)
-        base.extend ClassMethods
+        Extension.! base, ClassMethods
       end
 
       module ClassMethods
@@ -14,7 +14,7 @@ module Output
           logger = Logging.logger[name]
           logger.level = level
           logger.appenders = Output::Devices.build_device(device_options[:device], device_options)
-          logger.extend LevelName
+          Extension.! logger, LevelName
           logger
         end
       end
