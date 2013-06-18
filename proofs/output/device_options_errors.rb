@@ -16,7 +16,7 @@ class Hash
 end
 
 def options(options = {})
-  Extension.! options, Output::Devices::OptionValidation
+  options.extend Output::Devices::OptionValidation
 end
 
 proof 'Fails if options are not valid' do
