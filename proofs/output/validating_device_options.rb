@@ -1,6 +1,6 @@
 require_relative '../proofs_init'
 
-title 'Device Options Errors'
+title 'Validating Device Options'
 
 class Hash
   module Proof
@@ -19,7 +19,7 @@ def options(options = {})
   options.extend Output::Devices::OptionValidation
 end
 
-proof 'Fails if options are not valid' do
+proof 'Validation fails if options are not valid' do
   options = options(:layout => 'layout')
 
   options.prove { invalid? { validate!(:stdout, :layout) }}
