@@ -26,11 +26,9 @@ module DevicesDemo
   end
 end
 
-def output
-  DevicesDemo::Output.new
+def otp
+  DevicesDemo::Output
 end
-
-otp = output
 
 # Write to the different writers
 otp.string_io 'Hello String IO'
@@ -41,7 +39,7 @@ otp.error 'An error message'
 
 # Temporarily push a new string_io device to a writer, which will cause all writing to the writer to go to both devices
 device = otp.file_writer.push_device(:string_io) do
-  otp.file 'This should go to both devices'
+  otp.file 'This goes to both devices'
 end
 puts device.read
 
