@@ -6,10 +6,10 @@ source 'https://rubygems.org'
 require 'path_gem'
 
 gem 'logging'
-gem 'initializer'
-gem 'extension'
 
-# For development
+# For local development
 path_gem 'proof'
 path_gem 'setter'
 path_gem 'single'
+path_gem 'initializer'
+path_gem 'extension'
