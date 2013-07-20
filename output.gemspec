@@ -1,7 +1,4 @@
 # -*- encoding: utf-8 -*-
-lib = File.expand_path('../lib/', __FILE__)
-$:.unshift lib unless $:.include?(lib)
-
 Gem::Specification.new do |s|
   s.name = 'output'
   s.summary = 'Output Library'
@@ -14,4 +11,6 @@ Gem::Specification.new do |s|
   s.files = Dir.glob('{lib}/**/*')
 
   s.add_dependency 'logging'
+  s.add_dependency 'initializer'
+  s.add_dependency 'extension'
 end

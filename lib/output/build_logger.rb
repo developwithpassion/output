@@ -4,7 +4,7 @@ module Output
       extend self
 
       def self.included(base)
-        Extension.! base, ClassMethods
+        base.extend ClassMethods
       end
 
       module ClassMethods
