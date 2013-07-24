@@ -10,4 +10,4 @@ See demonstration code at: https://github.com/Sans/output/blob/master/proofs/dem
 
 ## License
 
-Output is released under the [MIT License](http://www.opensource.org/licenses/MIT).
+Output is released under the [MIT License](https://github.com/Sans/output/blob/master/MIT-license.txt).
